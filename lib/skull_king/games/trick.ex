@@ -3,11 +3,11 @@ defmodule SkullKing.Games.Trick do
 
   @primary_key {:id, UXID, autogenerate: true, prefix: "trick"}
   schema "tricks" do
-    field :winning_user_id, :string
     field :bonus_points, :integer
 
-    belongs_to :games, SkullKing.Games.Game, type: :string
-    belongs_to :rounds, SkullKing.Games.Round, type: :string
+    belongs_to :game, SkullKing.Games.Game, type: :string
+    belongs_to :round, SkullKing.Games.Round, type: :string
+    belongs_to :winning_user, SkullKing.Users.User, type: :string
 
     timestamps()
   end

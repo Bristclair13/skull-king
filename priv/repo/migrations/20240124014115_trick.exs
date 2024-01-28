@@ -5,7 +5,7 @@ defmodule SkullKing.Repo.Migrations.Trick do
     create table(:tricks, primary_key: [type: :text]) do
       add :game_id, references(:games, type: :text), null: false
       add :round_id, references(:rounds, type: :text), null: false
-      add :winning_user_id, :text
+      add :winning_user_id, references(:users, type: :text), null: false
       add :bonus_points, :text
 
       timestamps()

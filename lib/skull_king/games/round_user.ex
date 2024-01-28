@@ -10,8 +10,8 @@ defmodule SkullKing.Games.RoundUser do
     field :accumulated_score, :integer
 
     belongs_to :game, SkullKing.Games.Game, type: :string
-    has_many :rounds, SkullKing.Games.RoundUser
-    many_to_many :users, SkullKing.Games.GameUser, join_through: "game_users"
+    belongs_to :round, SkullKing.Games.RoundUser, type: :string
+    belongs_to :user, SkullKing.Games.GameUser, type: :string
 
     timestamps()
   end

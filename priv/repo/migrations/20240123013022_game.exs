@@ -3,7 +3,7 @@ defmodule SkullKing.Repo.Migrations.Game do
 
   def change do
     create table(:games, primary_key: [type: :text]) do
-      add(:join_code, :text)
+      add :join_code, :text, null: false
 
       timestamps()
     end

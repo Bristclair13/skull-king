@@ -4,7 +4,7 @@ defmodule SkullKing.Repo.Migrations.Round do
   def change do
     create table(:rounds, primary_key: [type: :text]) do
       add :game_id, references(:games, type: :text), null: false
-      add :number, :integer
+      add :number, :integer, null: false
 
       timestamps()
     end

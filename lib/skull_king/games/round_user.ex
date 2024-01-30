@@ -1,7 +1,7 @@
 defmodule SkullKing.Games.RoundUser do
   use Ecto.Schema
-
   import Ecto.Changeset
+  alias SkullKing.Games.RoundUser
 
   @primary_key {:id, UXID, autogenerate: true, prefix: "round_user"}
   schema "rounds_users" do
@@ -18,7 +18,7 @@ defmodule SkullKing.Games.RoundUser do
     timestamps()
   end
 
-  def changeset(round_user, params \\ %{}) do
+  def changeset(%RoundUser{} = round_user, params) do
     round_user
     |> cast(params, [
       :tricks_bid,

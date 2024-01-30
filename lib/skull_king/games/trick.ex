@@ -1,7 +1,7 @@
 defmodule SkullKing.Games.Trick do
   use Ecto.Schema
-
   import Ecto.Changeset
+  alias SkullKing.Games.Trick
 
   @primary_key {:id, UXID, autogenerate: true, prefix: "trick"}
   schema "tricks" do
@@ -14,7 +14,7 @@ defmodule SkullKing.Games.Trick do
     timestamps()
   end
 
-  def changeset(trick, params \\ %{}) do
+  def changeset(%Trick{} = trick, params) do
     trick
     |> cast(params, [:bonus_points, :game_id, :round_id, :winning_user_id])
     |> validate_required({:bonus_points, :game_id, :round_id, :winning_user_id})

@@ -1,7 +1,7 @@
 defmodule SkullKing.Users.User do
   use Ecto.Schema
-
   import Ecto.Changeset
+  alias SkullKing.Users.User
 
   alias SkullKing.Users.User
 

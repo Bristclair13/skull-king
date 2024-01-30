@@ -1,7 +1,7 @@
 defmodule SkullKing.Games.Round do
   use Ecto.Schema
-
   import Ecto.Changeset
+  alias SkullKing.Games.Round
 
   @primary_key {:id, UXID, autogenerate: true, prefix: "round"}
   schema "rounds" do
@@ -12,7 +12,7 @@ defmodule SkullKing.Games.Round do
     timestamps()
   end
 
-  def changeset(round, params \\ %{}) do
+  def changeset(%Round{} = round, params) do
     round
     |> cast(params, [:number, :game_id])
     |> validate_required([:number, :game_id])

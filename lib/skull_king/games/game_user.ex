@@ -1,6 +1,8 @@
 defmodule SkullKing.Games.GameUser do
   use Ecto.Schema
 
+  import Ecto.Changeset
+
   @primary_key {:id, UXID, autogenerate: true, prefix: "game_user"}
   schema "games_users" do
     field :user_order, :integer
@@ -9,5 +11,12 @@ defmodule SkullKing.Games.GameUser do
     belongs_to :user, SkullKing.Users.User, type: :string
 
     timestamps()
+  end
+
+  def changeset(game_user, params \\ %{}) do
+    game_user
+    |> cast(params, [:user_order, :game_id, :user_id])
+    |> validate_required([:user_order, :game_id, :user_id])
+    |> unique_constraint([:game_id, :user_id])
   end
 end

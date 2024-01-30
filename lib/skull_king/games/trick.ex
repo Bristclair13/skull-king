@@ -1,6 +1,8 @@
 defmodule SkullKing.Games.Trick do
   use Ecto.Schema
 
+  import Ecto.Changeset
+
   @primary_key {:id, UXID, autogenerate: true, prefix: "trick"}
   schema "tricks" do
     field :bonus_points, :integer
@@ -10,5 +12,12 @@ defmodule SkullKing.Games.Trick do
     belongs_to :winning_user, SkullKing.Users.User, type: :string
 
     timestamps()
+  end
+
+  def changeset(trick, params \\ %{}) do
+    trick
+    |> cast(params, [:bonus_points, :game_id, :round_id, :winning_user_id])
+    |> validate_required({:bonus_points, :game_id, :round_id, :winning_user_id})
+    |> unique_constraint([:round_id, :game_id])
   end
 end

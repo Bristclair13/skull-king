@@ -14,6 +14,14 @@ defmodule SkullKingWeb.Router do
     plug :accepts, ["json"]
   end
 
+  scope "/auth", SkullKingWeb do
+    pipe_through :browser
+
+    get "/:provider", AuthController, :request
+    get "/:provider/callback", AuthController, :callback
+    delete "/logout", AuthController, :delete
+  end
+
   scope "/", SkullKingWeb do
     pipe_through :browser
 

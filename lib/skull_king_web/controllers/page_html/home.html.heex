@@ -52,8 +52,20 @@
         v<%= Application.spec(:phoenix, :vsn) %>
       </small>
     </h1>
-    <p class="text-[2rem] mt-4 font-semibold leading-10 tracking-tighter text-zinc-900">
-      Peace of mind from prototype to production.
+    <p
+      :if={is_nil(@user)}
+      class="text-[2rem] mt-4 font-semibold leading-10 tracking-tighter text-zinc-900"
+    >
+      You are not logged in.
+      <.link navigate={~p"/auth/google"}>
+        Google
+      </.link>
+    </p>
+    <p
+      :if={not is_nil(@user)}
+      class="text-[2rem] mt-4 font-semibold leading-10 tracking-tighter text-zinc-900"
+    >
+      Welcome <%= @user.name %>!
     </p>
     <p class="mt-4 text-base leading-7 text-zinc-600">
       Build rich, interactive web applications quickly, with less code and fewer moving parts. Join our growing community of developers using Phoenix to craft APIs, HTML5 apps and more, for fun or at scale.

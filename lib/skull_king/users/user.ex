@@ -5,6 +5,11 @@ defmodule SkullKing.Users.User do
 
   alias SkullKing.Users.User
 
+  @type t :: %__MODULE__{
+          name: String.t(),
+          google_id: String.t()
+        }
+
   @primary_key {:id, UXID, autogenerate: true, prefix: "users"}
   schema "users" do
     field :name, :string

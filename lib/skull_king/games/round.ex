@@ -4,6 +4,11 @@ defmodule SkullKing.Games.Round do
   alias SkullKing.Games.Round
 
   @primary_key {:id, UXID, autogenerate: true, prefix: "round"}
+
+  @type t :: %__MODULE__{
+          number: integer()
+        }
+
   schema "rounds" do
     field :number, :integer
 

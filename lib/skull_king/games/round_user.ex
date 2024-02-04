@@ -4,6 +4,14 @@ defmodule SkullKing.Games.RoundUser do
   alias SkullKing.Games.RoundUser
 
   @primary_key {:id, UXID, autogenerate: true, prefix: "round_user"}
+
+  @type t :: %__MODULE__{
+          tricks_bid: integer(),
+          tricks_won: integer(),
+          bid_points_won: integer(),
+          bonus_points_won: integer(),
+          accumulated_score: integer()
+        }
   schema "rounds_users" do
     field :tricks_bid, :integer
     field :tricks_won, :integer

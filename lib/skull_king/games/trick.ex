@@ -4,6 +4,11 @@ defmodule SkullKing.Games.Trick do
   alias SkullKing.Games.Trick
 
   @primary_key {:id, UXID, autogenerate: true, prefix: "trick"}
+
+  @type t :: %__MODULE__{
+          bonus_points: integer()
+        }
+
   schema "tricks" do
     field :bonus_points, :integer
 

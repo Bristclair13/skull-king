@@ -3,6 +3,11 @@ defmodule SkullKing.Games.Game do
   import Ecto.Changeset
 
   @primary_key {:id, UXID, autogenerate: true, prefix: "game"}
+
+  @type t :: %__MODULE__{
+          join_code: integer()
+        }
+
   schema "games" do
     field :join_code, :string
 

@@ -3,6 +3,10 @@ defmodule SkullKing.Games.GameUser do
   import Ecto.Changeset
   alias SkullKing.Games.GameUser
 
+  @type t :: %__MODULE__{
+          user_order: integer()
+        }
+
   @primary_key {:id, UXID, autogenerate: true, prefix: "game_user"}
   schema "games_users" do
     field :user_order, :integer

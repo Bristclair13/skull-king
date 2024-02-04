@@ -34,7 +34,7 @@ defmodule SkullKing.Users do
     name = Enum.random(@pirate_names)
 
     case Repo.get(google_id) do
-      {:ok, user} -> {:ok, user}
+      user when is_struct(user) -> {:ok, user}
       _error -> Repo.create(%{name: name, google_id: google_id})
     end
   end

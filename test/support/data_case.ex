@@ -24,6 +24,10 @@ defmodule SkullKing.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import SkullKing.DataCase
+      import SkullKing.Factory
+      import Hammox
+
+      setup :verify_on_exit!
     end
   end
 

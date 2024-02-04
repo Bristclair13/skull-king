@@ -9,7 +9,14 @@ defmodule SkullKing.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      test_paths: ["lib"],
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.html": :test,
+        "coveralls.json": :test
+      ]
     ]
   end
 
@@ -33,12 +40,15 @@ defmodule SkullKing.MixProject do
   defp deps do
     [
       {:bandit, ">= 0.0.0"},
-      {:dotenv, "~> 3.0.0", only: [:dev, :test]},
       {:dns_cluster, "~> 0.1.1"},
+      {:dotenv, "~> 3.0.0", only: [:dev, :test]},
       {:ecto_sql, "~> 3.10"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
+      {:ex_machina, "~> 2.7.0", only: :test},
+      {:excoveralls, "~> 0.18", only: :test},
       {:floki, ">= 0.30.0", only: :test},
       {:gettext, "~> 0.20"},
+      {:hammox, "~> 0.7", only: :test},
       {:jason, "~> 1.2"},
       {:phoenix_ecto, "~> 4.4"},
       {:phoenix_html, "~> 3.3"},

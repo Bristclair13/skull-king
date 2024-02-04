@@ -1,6 +1,10 @@
 defmodule SkullKing.Users do
+  import SkullKing.MockHelper
+
   alias SkullKing.Users.Repo
   alias SkullKing.Users.User
+
+  mock SkullKing.Users.Repo
 
   @pirate_names [
     "William Kidd",
@@ -29,7 +33,7 @@ defmodule SkullKing.Users do
     "Caspian"
   ]
 
-  @spec find_or_create(String.t()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  @callback find_or_create(String.t()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def find_or_create(google_id) do
     name = Enum.random(@pirate_names)
 

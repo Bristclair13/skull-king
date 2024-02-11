@@ -25,6 +25,12 @@ defmodule SkullKingWeb.Router do
   scope "/", SkullKingWeb do
     pipe_through :browser
 
+    get "/login", PageController, :login
+  end
+
+  scope "/", SkullKingWeb do
+    pipe_through :browser
+
     get "/", PageController, :home
   end
 

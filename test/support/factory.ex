@@ -1,10 +1,11 @@
 defmodule SkullKing.Factory do
   use ExMachina.Ecto, repo: SkullKing.Repo
 
+  alias SkullKing.PirateNames
+
   def user_factory() do
     %SkullKing.Users.User{
-      # TODO: change to pirate name generator,
-      name: "name",
+      name: PirateNames.random_name(),
       google_id: Ecto.UUID.generate()
     }
   end

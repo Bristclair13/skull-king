@@ -30,7 +30,7 @@ defmodule SkullKingWeb.AuthController do
       {:error, reason} ->
         conn
         |> put_flash(:error, reason)
-        |> redirect(to: "/")
+        |> redirect(to: "/login")
     end
   end
 end

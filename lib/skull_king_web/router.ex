@@ -14,6 +14,10 @@ defmodule SkullKingWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :authenticated do
+    plug SkullKingWeb.Plugs.EnsureAuthenticated
+  end
+
   scope "/auth", SkullKingWeb do
     pipe_through :browser
 
@@ -29,7 +33,7 @@ defmodule SkullKingWeb.Router do
   end
 
   scope "/", SkullKingWeb do
-    pipe_through :browser
+    pipe_through [:browser, :authenticated]
 
     get "/", PageController, :home
   end

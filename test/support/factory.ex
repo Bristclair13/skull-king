@@ -1,7 +1,7 @@
 defmodule SkullKing.Factory do
   use ExMachina.Ecto, repo: SkullKing.Repo
 
-  alias SkullKing.PirateNames
+  alias SkullKing.Users.PirateNames
 
   def user_factory() do
     %SkullKing.Users.User{

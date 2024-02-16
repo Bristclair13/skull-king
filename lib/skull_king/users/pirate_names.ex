@@ -1,4 +1,4 @@
-defmodule SkullKing.PirateNames do
+defmodule SkullKing.Users.PirateNames do
   @pirate_names [
     "William Kidd",
     "Blackbeard",

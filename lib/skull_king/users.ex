@@ -1,9 +1,9 @@
 defmodule SkullKing.Users do
   import SkullKing.MockHelper
 
+  alias SkullKing.Users.PirateNames
   alias SkullKing.Users.Repo
   alias SkullKing.Users.User
-  alias SkullKing.PirateNames
 
   mock SkullKing.Users.Repo
 

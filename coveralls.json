@@ -16,6 +16,8 @@
         "lib/mock_helper.ex",
         "deps",
         "test/*",
-        "lib/skull_king_web/components/core_components.ex"
+        "lib/skull_king_web/components/core_components.ex",
+        "lib/skull_king/application.ex",
+        "lib/skull_king_web/gettext.ex"
     ]
 }

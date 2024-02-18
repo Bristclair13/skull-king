@@ -8,9 +8,7 @@ defmodule SkullKing.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      SkullKingWeb.Telemetry,
       SkullKing.Repo,
-      {DNSCluster, query: Application.get_env(:skull_king, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: SkullKing.PubSub},
       # Start a worker by calling: SkullKing.Worker.start_link(arg)
       # {SkullKing.Worker, arg},

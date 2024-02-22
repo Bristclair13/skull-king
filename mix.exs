@@ -40,6 +40,7 @@ defmodule SkullKing.MixProject do
   defp deps do
     [
       {:bandit, ">= 0.0.0"},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:dns_cluster, "~> 0.1.1"},
       {:dotenv, "~> 3.0.0", only: [:dev, :test]},
       {:ecto_sql, "~> 3.10"},

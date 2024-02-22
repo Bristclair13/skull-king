@@ -1,6 +1,6 @@
 defmodule SkullKing.Users.Repo do
-  alias SkullKing.Users.User
   alias SkullKing.Repo
+  alias SkullKing.Users.User
 
   @callback get(String.t()) :: User.t() | nil
   def get(google_id) do

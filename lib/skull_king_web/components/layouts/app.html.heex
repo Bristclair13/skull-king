@@ -1,6 +1,23 @@
+<.flash_group flash={@flash} />
+<header>
+  <nav>
+    <div class="flex bg-gradient-to-r from-red-900 to-neutral-50">
+      <.link navigate={~p"/games/create"} class="text-white underline p-2 my-2 rounded-full">
+        Create Game
+      </.link>
+      <.link navigate={~p"/games/join"} class="text-white underline p-2 my-2 mr-auto rounded-full">
+        Join Game
+      </.link>
+      <.link
+        href={~p"/auth/logout"}
+        method="delete"
+        class="text-red-900 underline p-2 my-2 mr-4 ml-auto rounded-full"
+      >
+        Logout
+      </.link>
+    </div>
+  </nav>
+</header>
 <main>
-  <div>
-    <.flash_group flash={@flash} />
-    <%= @inner_content %>
-  </div>
+  <%= @inner_content %>
 </main>

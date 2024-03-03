@@ -36,7 +36,7 @@ defmodule SkullKingWeb.Router do
     pipe_through [:browser, :authenticated]
 
     live "/", Home
-    live "/games/join", Home
+    live "/games/join", JoinGame
     live "/games/create", CreateGame
     live "/games/:id", Game
   end
@@ -59,6 +59,8 @@ defmodule SkullKingWeb.Router do
       pipe_through :browser
 
       live_dashboard "/dashboard", metrics: SkullKingWeb.Telemetry
+
+      get "/login-as/:id", SkullKingWeb.AuthController, :login_as
     end
   end
 end

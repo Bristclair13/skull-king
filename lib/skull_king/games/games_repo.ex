@@ -1,4 +1,5 @@
 defmodule SkullKing.Games.Repo do
+  alias SkullKing.Games.GameUser
   alias SkullKing.Games.Game
   alias SkullKing.Repo
 
@@ -7,12 +8,29 @@ defmodule SkullKing.Games.Repo do
     Repo.get(Game, id)
   end
 
+  @callback get_by(Keyword.t()) :: {:ok, Game.t()} | {:error, :game_not_found}
+  def get_by(by) do
+    case Repo.get_by(Game, by) do
+      game when is_struct(game) -> {:ok, game}
+      _error -> {:error, :game_not_found}
+    end
+  end
+
   @callback create() :: {:ok, Game.t()} | {:error, Ecto.Changeset.t()}
   def create() do
     join_code = for _n <- 1..10, into: "", do: <<Enum.random(~c"0123456789abcdef")>>
 
     %Game{}
     |> Game.changeset(%{join_code: join_code})
+    |> Repo.insert()
+  end
+
+  def add_user_to_game(user, game) do
+    game = Repo.preload(game, :users, force: true)
+    user_order = length(game.users)
+
+    %GameUser{}
+    |> GameUser.changeset(%{user_id: user.id, game_id: game.id, user_order: user_order})
     |> Repo.insert()
   end
 end

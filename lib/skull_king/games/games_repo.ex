@@ -6,6 +6,7 @@ defmodule SkullKing.Games.Repo do
   @callback get(String.t()) :: Game.t() | nil
   def get(id) do
     Repo.get(Game, id)
+    |> Repo.preload(:users)
   end
 
   @callback get_by(Keyword.t()) :: {:ok, Game.t()} | {:error, :game_not_found}

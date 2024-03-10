@@ -23,16 +23,21 @@ defmodule SkullKingWeb.Live.JoinGame do
   def handle_event("join", %{"join_code" => join_code}, socket) do
     case Games.join_game(socket.assigns.user, join_code) do
       {:ok, game} ->
-        {:noreply, push_navigate(socket, to: ~p"/games/#{game.id}")}
+        Phoenix.PubSub.broadcast(
+          SkullKing.PubSub,
+          game.id,
+          :user_joined
+        )
 
-        Phoenix.PubSub.broadcast(SkullKing.PubSub, "update_game_id", {:update_game_id, game.id})
-        {:noreply, assign(socket, :game_id, game.id)}
+        {:noreply, push_navigate(socket, to: ~p"/games/#{game.id}")}
 
       {:error, :game_not_found} ->
         form = to_form(%{"join_code" => join_code}, errors: [join_code: {"Game not found", []}])
         {:noreply, assign(socket, form: form)}
 
-      _error ->
+      error ->
+        dbg(error)
+
         form =
           to_form(%{"join_code" => join_code},
             errors: [join_code: {"Something went wrong, try again never", []}]

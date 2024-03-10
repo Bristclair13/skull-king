@@ -35,9 +35,7 @@ defmodule SkullKingWeb.Live.JoinGame do
         form = to_form(%{"join_code" => join_code}, errors: [join_code: {"Game not found", []}])
         {:noreply, assign(socket, form: form)}
 
-      error ->
-        dbg(error)
-
+      _error ->
         form =
           to_form(%{"join_code" => join_code},
             errors: [join_code: {"Something went wrong, try again never", []}]

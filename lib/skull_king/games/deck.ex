@@ -6,12 +6,12 @@ defmodule SkullKing.Games.Deck do
   def new_deck() do
     basic_cards =
       for value <- values(), color <- colors() do
-        %Card{color: color, value: value, image: "/images/cards/#{color}-#{value}.jpeg"}
+        %Card{color: color, value: value, image: "/images/cards/#{color}-#{value}.jpg"}
       end
 
     surrender_cards =
       Enum.map(1..5, fn _n ->
-        %Card{value: 0, special: :surrender, image: "/images/cards/surrender.jpeg"}
+        %Card{value: 0, special: :surrender, image: "/images/cards/surrender.jpg"}
       end)
 
     deck = basic_cards ++ surrender_cards

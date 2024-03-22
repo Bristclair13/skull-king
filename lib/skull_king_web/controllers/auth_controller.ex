@@ -33,4 +33,13 @@ defmodule SkullKingWeb.AuthController do
         |> redirect(to: "/login")
     end
   end
+
+  def login_as(conn, %{"id" => id}) do
+    {:ok, user} = Users.find_or_create(id)
+
+    conn
+    |> put_session(:current_user, user)
+    |> configure_session(renew: true)
+    |> redirect(to: "/")
+  end
 end

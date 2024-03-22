@@ -31,4 +31,20 @@ defmodule SkullKing.Games do
       _error -> {:error, :unexpected_error}
     end
   end
+
+  def start_round(game) do
+    with {:ok, round} <- Repo.create_round(game) do
+      cards_dealt = SkullKing.Games.Deck.deal(round, game.users)
+
+      Phoenix.PubSub.broadcast(
+        SkullKing.PubSub,
+        game.id,
+        {:round_started,
+         %{
+           number: round.number,
+           cards: cards_dealt
+         }}
+      )
+    end
+  end
 end

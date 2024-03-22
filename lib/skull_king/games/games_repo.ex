@@ -1,6 +1,7 @@
 defmodule SkullKing.Games.Repo do
   alias SkullKing.Games.GameUser
   alias SkullKing.Games.Game
+  alias SkullKing.Games.Round
   alias SkullKing.Repo
 
   @callback get(String.t()) :: Game.t() | nil
@@ -32,6 +33,15 @@ defmodule SkullKing.Games.Repo do
 
     %GameUser{}
     |> GameUser.changeset(%{user_id: user.id, game_id: game.id, user_order: user_order})
+    |> Repo.insert()
+  end
+
+  def create_round(game) do
+    game = Repo.preload(game, :rounds, force: true)
+    round_number = length(game.rounds) + 1
+
+    %Round{}
+    |> Round.changeset(%{number: round_number, game_id: game.id})
     |> Repo.insert()
   end
 end

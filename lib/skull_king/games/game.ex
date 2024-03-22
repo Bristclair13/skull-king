@@ -11,8 +11,9 @@ defmodule SkullKing.Games.Game do
   schema "games" do
     field :join_code, :string
 
-    many_to_many :users, SkullKing.Users.User, join_through: "games_users"
     has_many :rounds, SkullKing.Games.Round
+    has_many :game_users, SkullKing.Games.GameUser
+    has_many :users, through: [:game_users, :user]
 
     timestamps()
   end

@@ -1,6 +1,7 @@
 defmodule SkullKing.Games do
   alias SkullKing.Users.User
   alias SkullKing.Games.Repo
+  alias SkullKing.Games.State
 
   @callback get(String.t()) :: Game.t() | nil
   def get(id) do
@@ -35,15 +36,20 @@ defmodule SkullKing.Games do
   def start_round(game) do
     with {:ok, round} <- Repo.create_round(game) do
       cards_dealt = SkullKing.Games.Deck.deal(round, game.users)
+      first_user_id = Enum.random(game.game_users).user_id
+
+      info = %{
+        round_number: round.number,
+        cards: cards_dealt,
+        current_user_id: first_user_id
+      }
+
+      State.update_game(game.id, info)
 
       Phoenix.PubSub.broadcast(
         SkullKing.PubSub,
         game.id,
-        {:round_started,
-         %{
-           number: round.number,
-           cards: cards_dealt
-         }}
+        {:round_started, info}
       )
     end
   end

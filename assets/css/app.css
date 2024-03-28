@@ -11,3 +11,8 @@
     background-size: cover;
     opacity: 0.7;
 }
+
+.skull-pic {
+    background: url(/images/home_page.jpeg) no-repeat center center fixed;
+    opacity: 0.9;
+}

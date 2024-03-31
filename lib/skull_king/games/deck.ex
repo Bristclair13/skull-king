@@ -1,6 +1,6 @@
 defmodule SkullKing.Games.Deck do
   defmodule Card do
-    defstruct [:color, :value, :special, :image]
+    defstruct [:id, :color, :value, :special, :image]
   end
 
   def deal(round, users) do
@@ -60,6 +60,8 @@ defmodule SkullKing.Games.Deck do
             surrender_cards ++ pirate_cards ++ mermaid_cards
       ]
 
-    Enum.shuffle(deck)
+    deck
+    |> Enum.shuffle()
+    |> Enum.map(&Map.put(&1, :id, Ecto.UUID.generate()))
   end
 end

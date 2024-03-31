@@ -41,7 +41,8 @@ defmodule SkullKing.Games do
       info = %{
         round_number: round.number,
         cards: cards_dealt,
-        current_user_id: first_user_id
+        current_user_id: first_user_id,
+        cards_played: []
       }
 
       State.update_game(game.id, info)
@@ -52,5 +53,12 @@ defmodule SkullKing.Games do
         {:round_started, info}
       )
     end
+  end
+
+  def next_user(game, current_user_id) do
+    game_users = Enum.sort_by(game.game_users, & &1.user_order)
+    current_index = Enum.find_index(game_users, &(&1.user_id == current_user_id))
+    next_user = Enum.at(game_users, current_index + 1, List.first(game_users))
+    next_user.user_id
   end
 end

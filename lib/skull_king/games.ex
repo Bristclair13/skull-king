@@ -1,7 +1,7 @@
 defmodule SkullKing.Games do
-  alias SkullKing.Users.User
   alias SkullKing.Games.Repo
   alias SkullKing.Games.State
+  alias SkullKing.Users.User
 
   @callback get(String.t()) :: Game.t() | nil
   def get(id) do

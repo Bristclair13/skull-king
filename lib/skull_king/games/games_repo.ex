@@ -1,6 +1,6 @@
 defmodule SkullKing.Games.Repo do
-  alias SkullKing.Games.GameUser
   alias SkullKing.Games.Game
+  alias SkullKing.Games.GameUser
   alias SkullKing.Games.Round
   alias SkullKing.Repo
 

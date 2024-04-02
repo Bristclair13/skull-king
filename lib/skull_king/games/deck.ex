@@ -3,6 +3,27 @@ defmodule SkullKing.Games.Deck do
     defstruct [:id, :color, :value, :special, :image]
   end
 
+  def allowed_cards(my_cards, []) do
+    my_cards
+  end
+
+  def allowed_cards(my_cards, cards_played) do
+    characters = [:mermaid, :pirate, :skull_king, :tigress]
+
+    suit_card =
+      Enum.find(cards_played, fn card ->
+        not is_nil(card.color) or card.special in characters
+      end)
+
+    if not is_nil(suit_card.color) do
+      Enum.filter(my_cards, fn card ->
+        card.color == suit_card.color or is_nil(card.color)
+      end)
+    else
+      my_cards
+    end
+  end
+
   def deal(round, users) do
     deck = new_deck()
     cards_per_user = round.number

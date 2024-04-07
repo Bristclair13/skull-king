@@ -3,6 +3,7 @@ defmodule SkullKingWeb.Live.Game do
 
   alias SkullKing.Games
   alias SkullKing.Games.State
+  alias SkullKing.Games.Deck
 
   def mount(%{"id" => game_id}, session, socket) do
     user = session["current_user"]
@@ -55,16 +56,29 @@ defmodule SkullKingWeb.Live.Game do
       <div :for={card <- @cards_played}>
         <img src={card.image} class="h-48 w-40" />
       </div>
-      <div :if={@current_user_id == @user.id}>It's your turn</div>
-      <div class="flex flex-row shrink justify-center absolute bottom-0">
-        <.button
-          :for={card <- @my_cards}
-          phx-click="select_card"
-          phx-value-id={card.id}
-          data-confirm="Select Card"
-        >
-          <img src={card.image} class="h-48 w-40" />
-        </.button>
+      <div :if={@current_user_id != @user.id}>
+        <div class="flex flex-row shrink justify-center absolute bottom-0">
+          <div :for={card <- @my_cards}>
+            <img src={card.image} class="h-48 w-40" />
+          </div>
+        </div>
+      </div>
+      <div :if={@current_user_id == @user.id}>
+        <p>It's your turn</p>
+
+        <div class="flex flex-row shrink justify-center absolute bottom-0">
+          <div :for={card <- Deck.mark_cards_as_playable(@my_cards, @cards_played)}>
+            <.button
+              :if={card.playable}
+              phx-click="select_card"
+              phx-value-id={card.id}
+              data-confirm="Select Card"
+            >
+              <img src={card.image} class="h-48 w-40" />
+            </.button>
+            <img :if={not card.playable} src={card.image} class="opacity-30 h-48 w-40" />
+          </div>
+        </div>
       </div>
     </div>
     """

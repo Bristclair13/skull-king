@@ -47,5 +47,11 @@ defmodule SkullKing.Games.DeckTest do
 
     assert my_cards ==
              Deck.allowed_cards(my_cards, cards_played)
+
+    # if player does not have trump they can play any color
+
+    my_cards = [@pirate, @black_5, @black_10, @surrender]
+    cards_played = [@yellow_5]
+    assert my_cards == Deck.allowed_cards(my_cards, cards_played)
   end
 end

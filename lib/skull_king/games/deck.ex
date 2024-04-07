@@ -1,6 +1,6 @@
 defmodule SkullKing.Games.Deck do
   defmodule Card do
-    defstruct [:id, :color, :value, :special, :image]
+    defstruct [:playable, :id, :color, :value, :special, :image]
   end
 
   def allowed_cards(my_cards, []) do
@@ -15,7 +15,12 @@ defmodule SkullKing.Games.Deck do
         not is_nil(card.color) or card.special in characters
       end)
 
-    if not is_nil(suit_card.color) do
+    has_suit_card =
+      Enum.any?(my_cards, fn card ->
+        card.color == suit_card.color
+      end)
+
+    if not is_nil(suit_card.color) and has_suit_card do
       Enum.filter(my_cards, fn card ->
         card.color == suit_card.color or is_nil(card.color)
       end)
@@ -84,5 +89,14 @@ defmodule SkullKing.Games.Deck do
     deck
     |> Enum.shuffle()
     |> Enum.map(&Map.put(&1, :id, Ecto.UUID.generate()))
+  end
+
+  def mark_cards_as_playable(my_cards, cards_played) do
+    allowed_cards = allowed_cards(my_cards, cards_played)
+
+    Enum.map(my_cards, fn card ->
+      playable = card in allowed_cards
+      Map.put(card, :playable, playable)
+    end)
   end
 end

@@ -39,10 +39,11 @@ defmodule SkullKing.Games do
       first_user_id = Enum.random(game.game_users).user_id
 
       info = %{
-        round_number: round.number,
+        round: round,
         cards: cards_dealt,
         current_user_id: first_user_id,
-        cards_played: []
+        cards_played: [],
+        bidding_complete: false
       }
 
       State.update_game(game.id, info)

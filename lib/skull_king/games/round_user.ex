@@ -1,7 +1,6 @@
 defmodule SkullKing.Games.RoundUser do
   use Ecto.Schema
   import Ecto.Changeset
-  alias SkullKing.Games.RoundUser
 
   @primary_key {:id, UXID, autogenerate: true, prefix: "round_user"}
 
@@ -20,13 +19,16 @@ defmodule SkullKing.Games.RoundUser do
     field :accumulated_score, :integer
 
     belongs_to :game, SkullKing.Games.Game, type: :string
-    belongs_to :round, SkullKing.Games.RoundUser, type: :string
+    belongs_to :round, SkullKing.Games.Round, type: :string
     belongs_to :user, SkullKing.Games.GameUser, type: :string
 
     timestamps()
   end
 
-  def changeset(%RoundUser{} = round_user, params) do
+  # TODO: change to create_changeset/2
+  def changeset(round_user, round, params) do
+    dbg(round.number)
+
     round_user
     |> cast(params, [
       :tricks_bid,
@@ -35,19 +37,18 @@ defmodule SkullKing.Games.RoundUser do
       :bonus_points_won,
       :accumulated_score,
       :game_id,
-      :round_id,
       :user_id
     ])
     |> validate_required([
       :tricks_bid,
-      :tricks_won,
-      :bid_points_won,
-      :bonus_points_won,
-      :accumulated_score,
       :game_id,
-      :round_id,
       :user_id
     ])
+    |> put_assoc(:round, round)
+    |> validate_number(:tricks_bid, less_than_or_equal_to: round.number)
     |> unique_constraint([:round_id, :user_id])
   end
+
+  # def update_changeset() do
+  # end
 end

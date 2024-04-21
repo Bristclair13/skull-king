@@ -56,6 +56,22 @@ defmodule SkullKing.Games do
     end
   end
 
+  def save_bid(game, round, user, bid) do
+    {:ok, _round_user} =
+      Repo.create_round_user(%{
+        game_id: game.id,
+        user_id: user.id,
+        tricks_bid: bid,
+        round: round
+      })
+
+    Phoenix.PubSub.broadcast(
+      SkullKing.PubSub,
+      game.id,
+      :submitted_bid
+    )
+  end
+
   def next_user(game, current_user_id) do
     game_users = Enum.sort_by(game.game_users, & &1.user_order)
     current_index = Enum.find_index(game_users, &(&1.user_id == current_user_id))

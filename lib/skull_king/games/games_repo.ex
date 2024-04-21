@@ -2,6 +2,7 @@ defmodule SkullKing.Games.Repo do
   alias SkullKing.Games.Game
   alias SkullKing.Games.GameUser
   alias SkullKing.Games.Round
+  alias SkullKing.Games.RoundUser
   alias SkullKing.Repo
 
   @callback get(String.t()) :: Game.t() | nil
@@ -43,5 +44,14 @@ defmodule SkullKing.Games.Repo do
     %Round{}
     |> Round.changeset(%{number: round_number, game_id: game.id})
     |> Repo.insert()
+  end
+
+  def create_round_user(params) do
+    %RoundUser{}
+    |> RoundUser.changeset(params)
+    |> Repo.insert(
+      on_conflict: {:replace, [:tricks_bid, :updated_at]},
+      conflict_target: [:round_id, :user_id]
+    )
   end
 end

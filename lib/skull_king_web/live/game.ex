@@ -98,6 +98,10 @@ defmodule SkullKingWeb.Live.Game do
      )}
   end
 
+  def handle_info(:submitted_bid, socket) do
+    {:noreply, socket}
+  end
+
   def handle_info({:card_played, info}, socket) do
     {:noreply,
      assign(socket, cards_played: info.cards_played, current_user_id: info.current_user_id)}
@@ -110,22 +114,7 @@ defmodule SkullKingWeb.Live.Game do
   end
 
   def handle_event("bid", %{"round_user" => %{"tricks_bid" => tricks_bid}}, socket) do
-    RoundUser.changeset(
-      %RoundUser{},
-      socket.assigns.round,
-      %{
-        game_id: socket.assigns.game.id,
-        user_id: socket.assigns.user.id,
-        tricks_bid: tricks_bid
-      }
-    )
-
-    Phoenix.PubSub.broadcast(
-      Phoenix.PubSub,
-      socket.assigns.game.id,
-      :submitted_bid
-    )
-
+    Games.save_bid(socket.assigns.game, socket.assigns.round, socket.assigns.user, tricks_bid)
     {:noreply, socket}
   end
 
@@ -161,14 +150,14 @@ defmodule SkullKingWeb.Live.Game do
 
   defp bidding_form(assigns) do
     form =
-      RoundUser.changeset(%RoundUser{}, assigns.round, %{
+      RoundUser.changeset(%RoundUser{}, %{
         game_id: assigns.game.id,
         user_id: assigns.user.id,
-        tricks_bid: assigns.tricks_bid
+        tricks_bid: assigns.tricks_bid,
+        round: assigns.round
       })
       |> Map.put(:action, :insert)
       |> to_form()
-      |> dbg()
 
     assigns = assign(assigns, form: form)
 

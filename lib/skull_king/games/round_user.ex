@@ -25,9 +25,8 @@ defmodule SkullKing.Games.RoundUser do
     timestamps()
   end
 
-  # TODO: change to create_changeset/2
-  def changeset(round_user, round, params) do
-    dbg(round.number)
+  def changeset(round_user, params) do
+    round = params.round
 
     round_user
     |> cast(params, [

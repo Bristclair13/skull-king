@@ -38,7 +38,8 @@ defmodule SkullKing.Games do
       cards_dealt = SkullKing.Games.Deck.deal(round, game.users)
       first_user_id = Enum.random(game.game_users).user_id
 
-      info = %{
+      state = %State.Game{
+        version: :reset,
         round: round,
         cards: cards_dealt,
         current_user_id: first_user_id,
@@ -46,30 +47,30 @@ defmodule SkullKing.Games do
         bidding_complete: false
       }
 
-      State.update_game(game.id, info)
-
-      Phoenix.PubSub.broadcast(
-        SkullKing.PubSub,
-        game.id,
-        {:round_started, info}
-      )
+      State.update_game(game.id, state)
     end
   end
 
   def save_bid(game, round, user, bid) do
-    {:ok, _round_user} =
-      Repo.create_round_user(%{
-        game_id: game.id,
-        user_id: user.id,
-        tricks_bid: bid,
-        round: round
-      })
+    state = State.get_game(game.id)
 
-    Phoenix.PubSub.broadcast(
-      SkullKing.PubSub,
-      game.id,
-      :submitted_bid
-    )
+    unless state.bidding_complete do
+      {:ok, _round_user} =
+        Repo.create_round_user(%{
+          game_id: game.id,
+          user_id: user.id,
+          tricks_bid: bid,
+          round: round
+        })
+
+      round = SkullKing.Repo.preload(round, :round_users, force: true)
+      bidding_complete = length(game.game_users) == length(round.round_users)
+      new_state = %{state | round: round, bidding_complete: bidding_complete}
+
+      with {:error, :version_mismatch} <- State.update_game(game.id, new_state) do
+        save_bid(game, round, user, bid)
+      end
+    end
   end
 
   def next_user(game, current_user_id) do

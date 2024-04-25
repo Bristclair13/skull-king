@@ -11,32 +11,18 @@ defmodule SkullKingWeb.Live.Game do
     game = Games.get(game_id)
     Phoenix.PubSub.subscribe(SkullKing.PubSub, game.id)
 
-    socket =
-      case State.get_game(game_id) do
-        %{cards: cards} = info ->
-          my_cards = cards[user.id]
-          assigns = Map.put(info, :my_cards, my_cards)
+    %State.Game{} = state = State.get_game(game_id)
 
-          assign(socket, assigns)
-
-        nil ->
-          assign(socket,
-            cards: [],
-            my_cards: [],
-            cards_played: [],
-            current_user_id: nil,
-            round: nil,
-            bidding_complete: false
-          )
-      end
-
-    {:ok, assign(socket, game: game, user: user, tricks_bid: nil)}
+    {:ok, assign(socket, game: game, user: user, tricks_bid: nil, state: state)}
   end
 
   def render(assigns) do
+    my_cards = Map.get(assigns.state.cards, assigns.user.id, [])
+    assigns = assign(assigns, my_cards: my_cards)
+
     ~H"""
     <div class="h-screen bg-gray-500">
-      <div :if={is_nil(@round)}>
+      <div :if={is_nil(@state.round)}>
         <div class="border-2 w-1/2 absolute right-0 p-16 text-6xl">
           Join Code: <%= @game.join_code %>
         </div>
@@ -46,24 +32,24 @@ defmodule SkullKingWeb.Live.Game do
           Start Game
         </.button>
       </div>
-      <div :for={card <- @cards_played}>
+      <div :for={card <- @state.cards_played}>
         <img src={card.image} class="h-48 w-40" />
       </div>
-      <div :if={not @bidding_complete and not is_nil(@round)}>
-        <.bidding_form game={@game} round={@round} user={@user} tricks_bid={@tricks_bid} />
+      <div :if={not @state.bidding_complete and not is_nil(@state.round)}>
+        <.bidding_form game={@game} round={@state.round} user={@user} tricks_bid={@tricks_bid} />
       </div>
-      <div :if={@current_user_id != @user.id}>
+      <div :if={@state.current_user_id != @user.id}>
         <div class="flex flex-row shrink justify-center absolute bottom-0">
           <div :for={card <- @my_cards}>
             <img src={card.image} class="h-48 w-40" />
           </div>
         </div>
       </div>
-      <div :if={@current_user_id == @user.id}>
+      <div :if={@state.current_user_id == @user.id}>
         <p>It's your turn</p>
 
         <div class="flex flex-row shrink justify-center absolute bottom-0">
-          <div :for={card <- Deck.mark_cards_as_playable(@my_cards, @cards_played)}>
+          <div :for={card <- Deck.mark_cards_as_playable(@my_cards, @state.cards_played)}>
             <.button
               :if={card.playable}
               phx-click="select_card"
@@ -85,26 +71,12 @@ defmodule SkullKingWeb.Live.Game do
     {:noreply, assign(socket, game: game)}
   end
 
-  def handle_info({:round_started, info}, socket) do
-    my_cards = info.cards[socket.assigns.user.id]
-
-    {:noreply,
-     assign(socket,
-       round: info.round,
-       cards: info.cards,
-       my_cards: my_cards,
-       current_user_id: info.current_user_id,
-       bidding_complete: false
-     )}
+  def handle_info({:update_state, state}, socket) do
+    {:noreply, assign(socket, state: state)}
   end
 
   def handle_info(:submitted_bid, socket) do
     {:noreply, socket}
-  end
-
-  def handle_info({:card_played, info}, socket) do
-    {:noreply,
-     assign(socket, cards_played: info.cards_played, current_user_id: info.current_user_id)}
   end
 
   def handle_event("start_game", _params, socket) do
@@ -114,7 +86,13 @@ defmodule SkullKingWeb.Live.Game do
   end
 
   def handle_event("bid", %{"round_user" => %{"tricks_bid" => tricks_bid}}, socket) do
-    Games.save_bid(socket.assigns.game, socket.assigns.round, socket.assigns.user, tricks_bid)
+    Games.save_bid(
+      socket.assigns.game,
+      socket.assigns.state.round,
+      socket.assigns.user,
+      tricks_bid
+    )
+
     {:noreply, socket}
   end
 
@@ -123,29 +101,21 @@ defmodule SkullKingWeb.Live.Game do
   end
 
   def handle_event("select_card", %{"id" => card_id}, socket) do
-    my_cards = socket.assigns.my_cards
+    state = State.get_game(socket.assigns.game.id)
+    my_cards = state.cards[socket.assigns.user.id]
     card_played = Enum.find(my_cards, &(&1.id == card_id))
     remaining_cards = Enum.reject(my_cards, &(&1.id == card_id))
 
-    info = %{
-      cards_played: [card_played | socket.assigns.cards_played],
-      cards: Map.put(socket.assigns.cards, socket.assigns.user.id, remaining_cards),
-      round: socket.assigns.round,
-      current_user_id: Games.next_user(socket.assigns.game, socket.assigns.current_user_id)
+    state = %{
+      state
+      | cards_played: [card_played | state.cards_played],
+        cards: Map.put(state.cards, socket.assigns.user.id, remaining_cards),
+        current_user_id: Games.next_user(socket.assigns.game, state.current_user_id)
     }
 
-    State.update_game(socket.assigns.game.id, info)
+    State.update_game(socket.assigns.game.id, state)
 
-    Phoenix.PubSub.broadcast(
-      SkullKing.PubSub,
-      socket.assigns.game.id,
-      {:card_played, info}
-    )
-
-    {:noreply,
-     assign(socket,
-       my_cards: remaining_cards
-     )}
+    {:noreply, socket}
   end
 
   defp bidding_form(assigns) do

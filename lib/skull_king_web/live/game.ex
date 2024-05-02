@@ -17,17 +17,32 @@ defmodule SkullKingWeb.Live.Game do
   end
 
   def render(assigns) do
+    my_bid =
+      case assigns.state.round do
+        %{round_users: round_users} when is_list(round_users) ->
+          Enum.find_value(round_users, fn round_user ->
+            round_user.user_id == assigns.user.id && round_user.tricks_bid
+          end)
+
+        _other ->
+          nil
+      end
+
     my_cards = Map.get(assigns.state.cards, assigns.user.id, [])
-    assigns = assign(assigns, my_cards: my_cards)
+
+    assigns = assign(assigns, my_cards: my_cards, my_bid: my_bid)
 
     ~H"""
+    <div :if={is_nil(@state.round)}>
+      <div class="temple-background w-full h-screen"></div>
+    </div>
     <div class="h-screen bg-gray-500">
       <div :if={is_nil(@state.round)}>
-        <div class="border-2 w-1/2 absolute right-0 p-16 text-6xl">
+        <div class="absolute inset-x-1/3 inset-y-1/3 border-2 w-1/3 p-16 text-6xl">
           Join Code: <%= @game.join_code %>
         </div>
-
-        <div :for={user <- @game.users} class="border-2 w-1/3"><%= user.name %></div>
+        <div class="text-6xl underline underline-offset-4 w-1/3">Players joined</div>
+        <div :for={user <- @game.users} class="mt-4 text-4xl border-2 w-1/6"><%= user.name %></div>
         <.button class="absolute bottom-0 right-0 h-20 w-40 text-xl" phx-click="start_game">
           Start Game
         </.button>
@@ -45,6 +60,7 @@ defmodule SkullKingWeb.Live.Game do
           </div>
         </div>
       </div>
+      <div :if={@state.bidding_complete}>Your tricks bid: <%= @my_bid %></div>
       <div :if={@state.current_user_id == @user.id}>
         <p>It's your turn</p>
 

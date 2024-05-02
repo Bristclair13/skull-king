@@ -8,7 +8,7 @@ defmodule SkullKingWeb.Live.Home do
 
   def render(assigns) do
     ~H"""
-    <div class="h-full skull-pic">
+    <div class="skull-pic">
       <h1 class="absolute mt-10 ml-15 text-center text-9xl text-black">SKULL KING</h1>
     </div>
     <div class="flex flex-col absolute right-0 top-20 w-1/2 h-screen">

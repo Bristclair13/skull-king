@@ -1,6 +1,15 @@
 defmodule SkullKing.Games.State do
   defmodule Game do
-    defstruct [:version, :round, :cards, :current_user_id, :cards_played, :bidding_complete]
+    defstruct [
+      :bidding_complete,
+      :cards_played,
+      :cards,
+      :current_user_id,
+      :last_trick_cards_played,
+      :round,
+      :round_complete,
+      :version
+    ]
   end
 
   use GenServer
@@ -20,7 +29,8 @@ defmodule SkullKing.Games.State do
         cards_played: [],
         current_user_id: nil,
         round: nil,
-        bidding_complete: false
+        bidding_complete: false,
+        round_complete: false
       })
 
     {:reply, game_info, state}

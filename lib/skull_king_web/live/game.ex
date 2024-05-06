@@ -36,15 +36,24 @@ defmodule SkullKingWeb.Live.Game do
     <div :if={is_nil(@state.round)}>
       <div class="temple-background w-full h-screen"></div>
     </div>
-    <div class="h-screen bg-gray-500">
+    <div>
       <div :if={is_nil(@state.round)}>
         <div class="absolute inset-x-1/3 inset-y-1/3 border-2 w-1/3 p-16 text-6xl">
           Join Code: <%= @game.join_code %>
         </div>
-        <div class="text-6xl underline underline-offset-4 w-1/3">Players joined</div>
-        <div :for={user <- @game.users} class="mt-4 text-4xl border-2 w-1/6"><%= user.name %></div>
-        <.button class="absolute bottom-0 right-0 h-20 w-40 text-xl" phx-click="start_game">
+        <div class="absolute top-16 left-8 text-6xl underline underline-offset-4 w-1/3">
+          Players joined
+          <div :for={user <- @game.users} class="text-4xl mt-4">
+            <%= user.name %>
+          </div>
+        </div>
+        <.button class="absolute bottom-2 right-2 h-20 w-40 text-xl" phx-click="start_round">
           Start Game
+        </.button>
+      </div>
+      <div :if={@state.current_user_id == @user.id and @state.round_complete}>
+        <.button class="absolute bottom-2 right-2 h-20 w-40 text-xl" phx-click="start_round">
+          Start Next Round
         </.button>
       </div>
       <div :for={card <- @state.cards_played}>
@@ -60,7 +69,9 @@ defmodule SkullKingWeb.Live.Game do
           </div>
         </div>
       </div>
-      <div :if={@state.bidding_complete}>Your tricks bid: <%= @my_bid %></div>
+      <div class="text-3xl text-white absolute right-6 top-16">
+        <div :if={@state.bidding_complete}>Your tricks bid: <%= @my_bid %></div>
+      </div>
       <div :if={@state.current_user_id == @user.id}>
         <p>It's your turn</p>
 
@@ -95,7 +106,7 @@ defmodule SkullKingWeb.Live.Game do
     {:noreply, socket}
   end
 
-  def handle_event("start_game", _params, socket) do
+  def handle_event("start_round", _params, socket) do
     Games.start_round(socket.assigns.game)
 
     {:noreply, socket}
@@ -120,14 +131,41 @@ defmodule SkullKingWeb.Live.Game do
     state = State.get_game(socket.assigns.game.id)
     my_cards = state.cards[socket.assigns.user.id]
     card_played = Enum.find(my_cards, &(&1.id == card_id))
-    remaining_cards = Enum.reject(my_cards, &(&1.id == card_id))
+    cards_played = [card_played | state.cards_played]
+    my_remaining_cards = Enum.reject(my_cards, &(&1.id == card_id))
+    remaining_cards = Map.put(state.cards, socket.assigns.user.id, my_remaining_cards)
 
-    state = %{
-      state
-      | cards_played: [card_played | state.cards_played],
-        cards: Map.put(state.cards, socket.assigns.user.id, remaining_cards),
-        current_user_id: Games.next_user(socket.assigns.game, state.current_user_id)
-    }
+    state =
+      if length(cards_played) == length(socket.assigns.state.round.round_users) do
+        # trick is over
+        bonus_points = Deck.bonus_points_for_trick(cards_played)
+        winning_card = Deck.winning_card(cards_played)
+
+        {:ok, _trick} =
+          Games.save_trick(
+            socket.assigns.game,
+            socket.assigns.state.round,
+            winning_card.user_id,
+            bonus_points
+          )
+
+        %{
+          state
+          | cards_played: [],
+            cards: remaining_cards,
+            current_user_id: winning_card.user_id,
+            last_trick_cards_played: cards_played,
+            round_complete:
+              Enum.all?(remaining_cards, fn {_user_id, cards} -> Enum.empty?(cards) end)
+        }
+      else
+        %{
+          state
+          | cards_played: cards_played,
+            cards: remaining_cards,
+            current_user_id: Games.next_user(socket.assigns.game, state.current_user_id)
+        }
+      end
 
     State.update_game(socket.assigns.game.id, state)
 

@@ -44,7 +44,8 @@ defmodule SkullKing.Games do
         cards: cards_dealt,
         current_user_id: first_user_id,
         cards_played: [],
-        bidding_complete: false
+        bidding_complete: false,
+        round_complete: false
       }
 
       State.update_game(game.id, state)
@@ -71,6 +72,15 @@ defmodule SkullKing.Games do
         save_bid(game, round, user, bid)
       end
     end
+  end
+
+  def save_trick(game, round, winning_user_id, bonus_points) do
+    Repo.create_trick(%{
+      bonus_points: bonus_points,
+      game_id: game.id,
+      round_id: round.id,
+      winning_user_id: winning_user_id
+    })
   end
 
   def next_user(game, current_user_id) do

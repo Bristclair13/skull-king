@@ -1,6 +1,6 @@
 defmodule SkullKing.Games.Deck do
   defmodule Card do
-    defstruct [:playable, :id, :color, :value, :special, :image]
+    defstruct [:playable, :id, :color, :value, :special, :image, :user_id]
   end
 
   def allowed_cards(my_cards, []) do
@@ -17,10 +17,10 @@ defmodule SkullKing.Games.Deck do
 
     has_suit_card =
       Enum.any?(my_cards, fn card ->
-        card.color == suit_card.color
+        not is_nil(suit_card) and card.color == suit_card.color
       end)
 
-    if not is_nil(suit_card.color) and has_suit_card do
+    if not is_nil(suit_card) and not is_nil(suit_card.color) and has_suit_card do
       Enum.filter(my_cards, fn card ->
         card.color == suit_card.color or is_nil(card.color)
       end)
@@ -34,12 +34,13 @@ defmodule SkullKing.Games.Deck do
     cards_per_user = round.number
 
     {cards_dealt, _cards_remaining} =
-      Enum.reduce(users, {[], deck}, fn user, {cards_dealt, cards_remaining} ->
-        cards = Enum.take(cards_remaining, cards_per_user)
+      Enum.reduce(users, {[], deck}, fn user, {cards_dealt_acc, cards_remaining_acc} ->
+        assigned_cards = Enum.take(cards_remaining_acc, cards_per_user)
+        cards_with_user_id = Enum.map(assigned_cards, &Map.put(&1, :user_id, user.id))
 
         {
-          [{user.id, cards} | cards_dealt],
-          cards_remaining -- cards
+          [{user.id, cards_with_user_id} | cards_dealt_acc],
+          cards_remaining_acc -- assigned_cards
         }
       end)
 
@@ -98,5 +99,103 @@ defmodule SkullKing.Games.Deck do
       playable = card in allowed_cards
       Map.put(card, :playable, playable)
     end)
+  end
+
+  def bonus_points_for_trick(cards_played) do
+    winning_card = winning_card(cards_played)
+
+    Enum.map(cards_played, fn card ->
+      bonus_points_for_card(card, winning_card)
+    end)
+    |> Enum.sum()
+  end
+
+  defp bonus_points_for_card(card, winning_card) do
+    case {card, winning_card} do
+      {%Card{color: :black, value: 14}, _winning_card} -> 20
+      {%Card{value: 14}, _winning_card} -> 10
+      {%Card{special: :mermaid}, %Card{special: :pirate}} -> 20
+      {%Card{special: :pirate}, %Card{special: :skull_king}} -> 30
+      {%Card{special: :skull_king}, %Card{special: :mermaid}} -> 40
+      _no_bonus_points -> 0
+    end
+  end
+
+  def winning_card(cards_played) do
+    Enum.find(cards_played, fn card ->
+      Enum.all?(cards_played, fn compare_card ->
+        card == compare_card or card_wins?(card, compare_card)
+      end)
+    end)
+  end
+
+  defp card_wins?(%Card{special: :surrender}, %Card{special: :surrender}) do
+    true
+  end
+
+  defp card_wins?(%Card{special: :surrender}, _compare_card) do
+    false
+  end
+
+  defp card_wins?(_card, %Card{special: :surrender}) do
+    true
+  end
+
+  defp card_wins?(%Card{special: :skull_king}, %Card{special: :mermaid}) do
+    false
+  end
+
+  defp card_wins?(%Card{special: :skull_king}, _compare_card) do
+    true
+  end
+
+  defp card_wins?(%Card{special: :mermaid}, %Card{special: :pirate}) do
+    false
+  end
+
+  defp card_wins?(%Card{special: :mermaid}, _compare_card) do
+    true
+  end
+
+  defp card_wins?(%Card{special: :pirate}, %Card{special: :skull_king}) do
+    false
+  end
+
+  defp card_wins?(%Card{special: :pirate}, _compare_card) do
+    true
+  end
+
+  # all special cards have been matched by this point
+  # we know it is a color card
+  defp card_wins?(_card, %Card{special: special}) when not is_nil(special) do
+    false
+  end
+
+  defp card_wins?(%Card{value: value, color: :black}, %Card{value: compare_value, color: :black}) do
+    value > compare_value
+  end
+
+  defp card_wins?(%Card{color: :black}, _compare_card) do
+    true
+  end
+
+  defp card_wins?(_card, %Card{color: :black}) do
+    false
+  end
+
+  defp card_wins?(
+         %Card{value: value, color: color},
+         %Card{
+           value: compare_value,
+           color: compare_color
+         }
+       )
+       when color ==
+              compare_color do
+    value > compare_value
+  end
+
+  defp card_wins?(_card, _compare_card) do
+    true
   end
 end

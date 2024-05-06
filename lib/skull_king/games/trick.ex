@@ -22,7 +22,7 @@ defmodule SkullKing.Games.Trick do
   def changeset(%Trick{} = trick, params) do
     trick
     |> cast(params, [:bonus_points, :game_id, :round_id, :winning_user_id])
-    |> validate_required({:bonus_points, :game_id, :round_id, :winning_user_id})
+    |> validate_required([:bonus_points, :game_id, :round_id, :winning_user_id])
     |> unique_constraint([:round_id, :game_id])
   end
 end

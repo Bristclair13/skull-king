@@ -36,16 +36,25 @@ defmodule SkullKing.Games do
   def start_round(game) do
     with {:ok, round} <- Repo.create_round(game) do
       cards_dealt = SkullKing.Games.Deck.deal(round, game.users)
-      first_user_id = Enum.random(game.game_users).user_id
+
+      first_user_id =
+        if round.number == 1 do
+          Enum.random(game.game_users).user_id
+        else
+          %{starting_user_id: last_starting_user_id} = State.get_game(game.id)
+          next_user(game, last_starting_user_id)
+        end
 
       state = %State.Game{
-        version: :reset,
-        round: round,
+        bidding_complete: false,
+        cards_played: [],
         cards: cards_dealt,
         current_user_id: first_user_id,
-        cards_played: [],
-        bidding_complete: false,
-        round_complete: false
+        round_complete: false,
+        round: round,
+        starting_user_id: first_user_id,
+        trick_number: 1,
+        version: :reset
       }
 
       State.update_game(game.id, state)
@@ -74,12 +83,15 @@ defmodule SkullKing.Games do
     end
   end
 
-  def save_trick(game, round, winning_user_id, bonus_points) do
+  def save_trick(game, winning_user_id, bonus_points) do
+    %{trick_number: trick_number, round: round} = State.get_game(game.id)
+
     Repo.create_trick(%{
       bonus_points: bonus_points,
       game_id: game.id,
       round_id: round.id,
-      winning_user_id: winning_user_id
+      winning_user_id: winning_user_id,
+      number: trick_number
     })
   end
 

@@ -128,7 +128,7 @@ defmodule SkullKingWeb.Live.Game do
   end
 
   def handle_event("select_card", %{"id" => card_id}, socket) do
-    state = State.get_game(socket.assigns.game.id)
+    state = socket.assigns.state
     my_cards = state.cards[socket.assigns.user.id]
     card_played = Enum.find(my_cards, &(&1.id == card_id))
     cards_played = [card_played | state.cards_played]
@@ -136,7 +136,7 @@ defmodule SkullKingWeb.Live.Game do
     remaining_cards = Map.put(state.cards, socket.assigns.user.id, my_remaining_cards)
 
     state =
-      if length(cards_played) == length(socket.assigns.state.round.round_users) do
+      if length(cards_played) == length(state.round.round_users) do
         # trick is over
         bonus_points = Deck.bonus_points_for_trick(cards_played)
         winning_card = Deck.winning_card(cards_played)
@@ -144,7 +144,6 @@ defmodule SkullKingWeb.Live.Game do
         {:ok, _trick} =
           Games.save_trick(
             socket.assigns.game,
-            socket.assigns.state.round,
             winning_card.user_id,
             bonus_points
           )
@@ -155,6 +154,7 @@ defmodule SkullKingWeb.Live.Game do
             cards: remaining_cards,
             current_user_id: winning_card.user_id,
             last_trick_cards_played: cards_played,
+            trick_number: state.trick_number + 1,
             round_complete:
               Enum.all?(remaining_cards, fn {_user_id, cards} -> Enum.empty?(cards) end)
         }

@@ -6,8 +6,10 @@ defmodule SkullKing.Games.State do
       :cards,
       :current_user_id,
       :last_trick_cards_played,
-      :round,
       :round_complete,
+      :round,
+      :starting_user_id,
+      :trick_number,
       :version
     ]
   end
@@ -46,8 +48,9 @@ defmodule SkullKing.Games.State do
       end
 
     if update_version == current_version or update_version == :reset do
-      new_state = Map.put(state, game_id, Map.put(info, :version, current_version + 1))
-      {:reply, :ok, new_state}
+      new_game_state = Map.put(info, :version, current_version + 1)
+      new_state = Map.put(state, game_id, new_game_state)
+      {:reply, {:ok, new_game_state}, new_state}
     else
       {:reply, {:error, :version_mismatch}, state}
     end
@@ -59,11 +62,11 @@ defmodule SkullKing.Games.State do
 
   def update_game(game_id, %Game{} = state) do
     case GenServer.call(__MODULE__, {:update_game, game_id, state}) do
-      :ok ->
+      {:ok, new_game_state} ->
         Phoenix.PubSub.broadcast(
           SkullKing.PubSub,
           game_id,
-          {:update_state, state}
+          {:update_state, new_game_state}
         )
 
       error ->

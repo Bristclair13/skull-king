@@ -11,6 +11,7 @@ defmodule SkullKing.Games.Trick do
 
   schema "tricks" do
     field :bonus_points, :integer
+    field :number, :integer
 
     belongs_to :game, SkullKing.Games.Game, type: :string
     belongs_to :round, SkullKing.Games.Round, type: :string
@@ -21,8 +22,8 @@ defmodule SkullKing.Games.Trick do
 
   def changeset(%Trick{} = trick, params) do
     trick
-    |> cast(params, [:bonus_points, :game_id, :round_id, :winning_user_id])
-    |> validate_required([:bonus_points, :game_id, :round_id, :winning_user_id])
-    |> unique_constraint([:round_id, :game_id])
+    |> cast(params, [:bonus_points, :number, :game_id, :round_id, :winning_user_id])
+    |> validate_required([:bonus_points, :number, :game_id, :round_id, :winning_user_id])
+    |> unique_constraint([:game_id, :round_id, :number])
   end
 end

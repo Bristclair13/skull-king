@@ -31,14 +31,33 @@ defmodule SkullKing.Games.DeckTest do
              ^user_3_id => [%SkullKing.Games.Deck.Card{user_id: ^user_3_id}]
            } = Deck.deal(round, users)
 
-    round = build(:round, number: 3) |> dbg()
+    round = build(:round, number: 3)
+    %{id: user_1_id} = user_1 = build(:user)
+    %{id: user_2_id} = user_2 = build(:user)
+    %{id: user_3_id} = user_3 = build(:user)
+
+    users = [user_1, user_2, user_3]
+
+    assert %{
+             ^user_1_id => [
+               %SkullKing.Games.Deck.Card{user_id: ^user_1_id},
+               %SkullKing.Games.Deck.Card{user_id: ^user_1_id},
+               %SkullKing.Games.Deck.Card{user_id: ^user_1_id}
+             ],
+             ^user_2_id => [
+               %SkullKing.Games.Deck.Card{user_id: ^user_2_id},
+               %SkullKing.Games.Deck.Card{user_id: ^user_2_id},
+               %SkullKing.Games.Deck.Card{user_id: ^user_2_id}
+             ],
+             ^user_3_id => [
+               %SkullKing.Games.Deck.Card{user_id: ^user_3_id},
+               %SkullKing.Games.Deck.Card{user_id: ^user_3_id},
+               %SkullKing.Games.Deck.Card{user_id: ^user_3_id}
+             ]
+           } = Deck.deal(round, users)
   end
 
   test "allowed_cards/2" do
-    # my_cards = []
-    # cards_played = []
-    # assert [] == Deck.allowed_cards(my_cards, cards_played)
-
     # returns all cards if cards played is empty
 
     my_cards = [@pirate, @yellow_5, @black_10, @surrender, @black_5]
@@ -183,5 +202,43 @@ defmodule SkullKing.Games.DeckTest do
     cards_played = [@pirate, @purple_14, @yellow_14]
 
     assert 20 == Deck.bonus_points_for_trick(cards_played)
+  end
+
+  test "mark_cards_as_playable/2" do
+    my_cards = [@pirate, @yellow_5, @black_10, @surrender, @black_5]
+    cards_played = [@black_3]
+
+    assert [
+             %SkullKing.Games.Deck.Card{
+               playable: true,
+               color: nil,
+               value: nil,
+               special: :pirate
+             },
+             %SkullKing.Games.Deck.Card{
+               playable: false,
+               color: :yellow,
+               value: 5,
+               special: nil
+             },
+             %SkullKing.Games.Deck.Card{
+               playable: true,
+               color: :black,
+               value: 10,
+               special: nil
+             },
+             %SkullKing.Games.Deck.Card{
+               playable: true,
+               color: nil,
+               value: 0,
+               special: :surrender
+             },
+             %SkullKing.Games.Deck.Card{
+               playable: true,
+               color: :black,
+               value: 5,
+               special: nil
+             }
+           ] = Deck.mark_cards_as_playable(my_cards, cards_played)
   end
 end

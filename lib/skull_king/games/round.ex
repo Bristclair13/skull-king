@@ -14,6 +14,7 @@ defmodule SkullKing.Games.Round do
 
     belongs_to :game, SkullKing.Games.Game, type: :string
     has_many :round_users, SkullKing.Games.RoundUser
+    has_many :tricks, SkullKing.Games.Trick
 
     timestamps()
   end

@@ -61,6 +61,45 @@ defmodule SkullKing.Games do
     end
   end
 
+  def score_round(game, round) do
+    tricks = SkullKing.Repo.preload(round, :tricks).tricks
+
+    Enum.each(round.round_users, fn round_user ->
+      tricks_bid = round_user.tricks_bid
+
+      tricks_won =
+        Enum.filter(tricks, fn trick ->
+          trick.winning_user_id == round_user.user_id
+        end)
+
+      {bid_points_won, bonus_points_won} =
+        cond do
+          tricks_bid == 0 and Enum.empty?(tricks_won) ->
+            {round.number * 10, 0}
+
+          tricks_bid == 0 ->
+            {round.number * -10, 0}
+
+          tricks_bid == length(tricks_won) ->
+            bonus_points = tricks_won |> Enum.map(& &1.bonus_points) |> Enum.sum()
+            {tricks_bid * 20, bonus_points}
+
+          true ->
+            points_lost = abs(length(tricks_won) - tricks_bid) * -10
+            {points_lost, 0}
+        end
+
+      # move into game repo
+      round_user
+      |> SkullKing.Games.RoundUser.score_changeset(%{
+        tricks_won: length(tricks_won),
+        bid_points_won: bid_points_won,
+        bonus_points_won: bonus_points_won
+      })
+      |> SkullKing.Repo.update()
+    end)
+  end
+
   def save_bid(game, round, user, bid) do
     state = State.get_game(game.id)
 

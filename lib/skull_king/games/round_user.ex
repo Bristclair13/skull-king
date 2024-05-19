@@ -8,15 +8,13 @@ defmodule SkullKing.Games.RoundUser do
           tricks_bid: integer(),
           tricks_won: integer(),
           bid_points_won: integer(),
-          bonus_points_won: integer(),
-          accumulated_score: integer()
+          bonus_points_won: integer()
         }
   schema "rounds_users" do
     field :tricks_bid, :integer
     field :tricks_won, :integer
     field :bid_points_won, :integer
     field :bonus_points_won, :integer
-    field :accumulated_score, :integer
 
     belongs_to :game, SkullKing.Games.Game, type: :string
     belongs_to :round, SkullKing.Games.Round, type: :string
@@ -34,7 +32,6 @@ defmodule SkullKing.Games.RoundUser do
       :tricks_won,
       :bid_points_won,
       :bonus_points_won,
-      :accumulated_score,
       :game_id,
       :user_id
     ])
@@ -48,6 +45,17 @@ defmodule SkullKing.Games.RoundUser do
     |> unique_constraint([:round_id, :user_id])
   end
 
-  # def update_changeset() do
-  # end
+  def score_changeset(round_user, params) do
+    round_user
+    |> cast(params, [
+      :tricks_won,
+      :bid_points_won,
+      :bonus_points_won
+    ])
+    |> validate_required([
+      :bid_points_won,
+      :bonus_points_won,
+      :tricks_won
+    ])
+  end
 end

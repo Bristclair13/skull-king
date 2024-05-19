@@ -167,6 +167,13 @@ defmodule SkullKingWeb.Live.Game do
             bonus_points
           )
 
+        round_complete =
+          Enum.all?(remaining_cards, fn {_user_id, cards} -> Enum.empty?(cards) end)
+
+        if round_complete do
+          Games.score_round(socket.assigns.game, state.round)
+        end
+
         %{
           state
           | cards_played: [],
@@ -174,8 +181,7 @@ defmodule SkullKingWeb.Live.Game do
             current_user_id: winning_card.user_id,
             last_trick_cards_played: cards_played,
             trick_number: state.trick_number + 1,
-            round_complete:
-              Enum.all?(remaining_cards, fn {_user_id, cards} -> Enum.empty?(cards) end)
+            round_complete: round_complete
         }
       else
         %{

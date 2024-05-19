@@ -33,8 +33,16 @@ defmodule SkullKingWeb.Live.Game do
     assigns = assign(assigns, my_cards: my_cards, my_bid: my_bid)
 
     ~H"""
-    <div :if={is_nil(@state.round)}>
-      <div class="temple-background w-full h-screen"></div>
+    <div
+      :if={@state.current_user_id == @user.id}
+      class="absolute top-0 left-0 right-0 h-14 flex items-center justify-center"
+    >
+      <div class="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10">
+        It's your turn
+      </div>
+    </div>
+    <div :if={is_nil(@state.round)} class="h-full">
+      <div class="temple-background w-full h-full"></div>
     </div>
     <div>
       <div :if={is_nil(@state.round)}>
@@ -59,32 +67,43 @@ defmodule SkullKingWeb.Live.Game do
       <div :for={card <- @state.cards_played}>
         <img src={card.image} class="h-48 w-40" />
       </div>
-      <div :if={not @state.bidding_complete and not is_nil(@state.round)}>
+      <div
+        :if={not @state.bidding_complete and not is_nil(@state.round)}
+        class="w-96 mx-auto bg-white p-4 mt-8 rounded"
+      >
         <.bidding_form game={@game} round={@state.round} user={@user} tricks_bid={@tricks_bid} />
       </div>
-      <div :if={@state.current_user_id != @user.id}>
-        <div class="flex flex-row shrink justify-center absolute bottom-0">
-          <div :for={card <- @my_cards}>
-            <img src={card.image} class="h-48 w-40" />
-          </div>
+      <div
+        :if={@state.current_user_id != @user.id}
+        class="flex justify-center absolute bottom-0 left-0 right-0"
+      >
+        <div :for={card <- @my_cards}>
+          <img src={card.image} class="h-48 w-40" />
         </div>
       </div>
       <div class="text-3xl text-white absolute right-6 top-16">
         <div :if={@state.bidding_complete}>Your tricks bid: <%= @my_bid %></div>
       </div>
       <div :if={@state.current_user_id == @user.id}>
-        <p>It's your turn</p>
-
-        <div class="flex flex-row shrink justify-center absolute bottom-0">
+        <div class="flex justify-center absolute bottom-0 left-0 right-0 gap-x-2 mb-2">
           <div :for={card <- Deck.mark_cards_as_playable(@my_cards, @state.cards_played)}>
             <.button
-              :if={card.playable}
+              :if={card.playable and card.special != :tigress}
               phx-click="select_card"
               phx-value-id={card.id}
               data-confirm="Select Card"
             >
               <img src={card.image} class="h-48 w-40" />
             </.button>
+            <div :if={card.playable and card.special == :tigress}>
+              <img src={card.image} class="h-48 w-40" />
+              <.button>
+                Play as pirate
+              </.button>
+              <.button>
+                Play as surrender
+              </.button>
+            </div>
             <img :if={not card.playable} src={card.image} class="opacity-30 h-48 w-40" />
           </div>
         </div>

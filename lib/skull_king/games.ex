@@ -61,7 +61,7 @@ defmodule SkullKing.Games do
     end
   end
 
-  def score_round(game, round) do
+  def score_round(_game, round) do
     tricks = SkullKing.Repo.preload(round, :tricks).tricks
 
     Enum.each(round.round_users, fn round_user ->
@@ -89,14 +89,11 @@ defmodule SkullKing.Games do
             {points_lost, 0}
         end
 
-      # move into game repo
-      round_user
-      |> SkullKing.Games.RoundUser.score_changeset(%{
+      Repo.update_round_user_score(round_user, %{
         tricks_won: length(tricks_won),
         bid_points_won: bid_points_won,
         bonus_points_won: bonus_points_won
       })
-      |> SkullKing.Repo.update()
     end)
   end
 

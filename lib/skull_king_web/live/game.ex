@@ -33,14 +33,6 @@ defmodule SkullKingWeb.Live.Game do
     assigns = assign(assigns, my_cards: my_cards, my_bid: my_bid)
 
     ~H"""
-    <div
-      :if={@state.current_user_id == @user.id}
-      class="absolute top-0 left-0 right-0 h-14 flex items-center justify-center"
-    >
-      <div class="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10">
-        It's your turn
-      </div>
-    </div>
     <div :if={is_nil(@state.round)} class="h-full">
       <div class="temple-background w-full h-full"></div>
     </div>
@@ -85,7 +77,7 @@ defmodule SkullKingWeb.Live.Game do
         <div :if={@state.bidding_complete}>Your tricks bid: <%= @my_bid %></div>
       </div>
       <div :if={@state.current_user_id == @user.id}>
-        <div class="flex justify-center absolute bottom-0 left-0 right-0 gap-x-2 mb-2">
+        <div class="flex justify-center bottom-0 left-0 right-0 gap-x-2 mb-2 mt-60">
           <div :for={card <- Deck.mark_cards_as_playable(@my_cards, @state.cards_played)}>
             <.button
               :if={card.playable and card.special != :tigress}
@@ -105,6 +97,15 @@ defmodule SkullKingWeb.Live.Game do
               </.button>
             </div>
             <img :if={not card.playable} src={card.image} class="opacity-30 h-48 w-40" />
+          </div>
+          <div :if={@state.current_user_id == @user.id}>
+            <div>
+              <footer class="absolute bottom-0 bg-neutral-900 left-0 right-0 h-14 text-white underline">
+                <div class="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 mt-4 ml-2 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10">
+                  It's your turn
+                </div>
+              </footer>
+            </div>
           </div>
         </div>
       </div>

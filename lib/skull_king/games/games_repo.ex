@@ -61,4 +61,10 @@ defmodule SkullKing.Games.Repo do
     |> Trick.changeset(params)
     |> Repo.insert()
   end
+
+  def update_round_user_score(round_user, params) do
+    round_user
+    |> SkullKing.Games.RoundUser.score_changeset(params)
+    |> SkullKing.Repo.update()
+  end
 end

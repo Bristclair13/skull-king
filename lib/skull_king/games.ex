@@ -1,22 +1,24 @@
 defmodule SkullKing.Games do
-  alias SkullKing.Games.Repo
+  use Injexor, otp_app: :skull_king, inject: [SkullKing.Games.Storage]
+
+  alias SkullKing.Games.Storage
   alias SkullKing.Games.State
   alias SkullKing.Users.User
 
   @callback get(String.t()) :: Game.t() | nil
   def get(id) do
-    Repo.get(id)
+    Storage.get(id)
   end
 
   @callback get_by(Keyword.t()) :: {:ok, Game.t()} | {:error, :game_not_found}
   def get_by(by) do
-    Repo.get_by(by)
+    Storage.get_by(by)
   end
 
   @callback create(User.t()) :: {:ok, Game.t()} | {:error, Ecto.Changeset.t()}
   def create(user) do
-    with {:ok, game} <- Repo.create(),
-         {:ok, _game_user} <- Repo.add_user_to_game(user, game) do
+    with {:ok, game} <- Storage.create(),
+         {:ok, _game_user} <- Storage.add_user_to_game(user, game) do
       {:ok, game}
     end
   end
@@ -25,7 +27,7 @@ defmodule SkullKing.Games do
               {:ok, Game.t()} | {:error, :game_not_found} | {:error, :unexpected_error}
   def join_game(user, join_code) do
     with {:ok, game} <- get_by(join_code: join_code),
-         {:ok, _game_user} <- Repo.add_user_to_game(user, game) do
+         {:ok, _game_user} <- Storage.add_user_to_game(user, game) do
       {:ok, game}
     else
       {:error, :game_not_found} -> {:error, :game_not_found}
@@ -34,7 +36,7 @@ defmodule SkullKing.Games do
   end
 
   def start_round(game) do
-    with {:ok, round} <- Repo.create_round(game) do
+    with {:ok, round} <- Storage.create_round(game) do
       cards_dealt = SkullKing.Games.Deck.deal(round, game.users)
 
       first_user_id =
@@ -61,8 +63,8 @@ defmodule SkullKing.Games do
     end
   end
 
-  def score_round(_game, round) do
-    tricks = SkullKing.Repo.preload(round, :tricks).tricks
+  def score_round(round) do
+    tricks = Storage.get_tricks_for_round(round)
 
     Enum.each(round.round_users, fn round_user ->
       tricks_bid = round_user.tricks_bid
@@ -89,7 +91,7 @@ defmodule SkullKing.Games do
             {points_lost, 0}
         end
 
-      Repo.update_round_user_score(round_user, %{
+      Storage.update_round_user_score(round_user, %{
         tricks_won: length(tricks_won),
         bid_points_won: bid_points_won,
         bonus_points_won: bonus_points_won
@@ -102,14 +104,14 @@ defmodule SkullKing.Games do
 
     unless state.bidding_complete do
       {:ok, _round_user} =
-        Repo.create_round_user(%{
+        Storage.create_round_user(%{
           game_id: game.id,
           user_id: user.id,
           tricks_bid: bid,
           round: round
         })
 
-      round = SkullKing.Repo.preload(round, :round_users, force: true)
+      round = SkullKing.Storage.preload(round, :round_users, force: true)
       bidding_complete = length(game.game_users) == length(round.round_users)
       new_state = %{state | round: round, bidding_complete: bidding_complete}
 
@@ -122,7 +124,7 @@ defmodule SkullKing.Games do
   def save_trick(game, winning_user_id, bonus_points) do
     %{trick_number: trick_number, round: round} = State.get_game(game.id)
 
-    Repo.create_trick(%{
+    Storage.create_trick(%{
       bonus_points: bonus_points,
       game_id: game.id,
       round_id: round.id,

@@ -26,4 +26,11 @@ defmodule SkullKing.Factory do
       join_code: join_code
     }
   end
+
+  def trick_factory() do
+    %SkullKing.Games.Trick{
+      bonus_points: 0,
+      number: 1
+    }
+  end
 end

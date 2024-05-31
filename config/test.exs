@@ -25,3 +25,6 @@ config :logger, level: :warning
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
+
+config :skull_king, SkullKing.Games, SkullKing.Games.Mock
+config :skull_king, SkullKing.Games.Storage, SkullKing.Games.Storage.Mock

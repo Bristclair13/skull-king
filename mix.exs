@@ -50,6 +50,7 @@ defmodule SkullKing.MixProject do
       {:floki, ">= 0.30.0", only: :test},
       {:gettext, "~> 0.20"},
       {:hammox, "~> 0.7", only: :test},
+      {:injexor, "~> 0.1"},
       {:jason, "~> 1.2"},
       {:phoenix_ecto, "~> 4.4"},
       {:phoenix_html, "~> 3.3"},

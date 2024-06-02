@@ -1,6 +1,28 @@
-<main>
-  <div>
-    <.flash_group flash={@flash} />
+<div class="h-screen">
+  <.flash_group flash={@flash} />
+  <header class="bg-white h-14">
+    <nav>
+      <div class="flex items-center">
+        <.link navigate={~p"/games/create"} class="text-black underline p-2 my-2 rounded-full">
+          Create Game
+        </.link>
+        <.link
+          navigate={~p"/games/join"}
+          class="text-black underline p-2 my-2 mr-auto rounded-full"
+        >
+          Join Game
+        </.link>
+        <.link
+          href={~p"/auth/logout"}
+          method="delete"
+          class="text-black underline p-2 my-2 mr-4 ml-auto rounded-full"
+        >
+          Logout
+        </.link>
+      </div>
+    </nav>
+  </header>
+  <main class="h-full">
     <%= @inner_content %>
-  </div>
-</main>
+  </main>
+</div>

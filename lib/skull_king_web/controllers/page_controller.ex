@@ -4,8 +4,4 @@ defmodule SkullKingWeb.PageController do
   def login(conn, _params) do
     render(conn, :login, layout: false)
   end
-
-  def home(conn, _params) do
-    render(conn, :home)
-  end
 end

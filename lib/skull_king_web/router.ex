@@ -32,10 +32,13 @@ defmodule SkullKingWeb.Router do
     get "/login", PageController, :login
   end
 
-  scope "/", SkullKingWeb do
+  scope "/", SkullKingWeb.Live do
     pipe_through [:browser, :authenticated]
 
-    get "/", PageController, :home
+    live "/", Home
+    live "/games/join", JoinGame
+    live "/games/create", CreateGame
+    live "/games/:id", Game
   end
 
   # Other scopes may use custom stacks.
@@ -56,6 +59,8 @@ defmodule SkullKingWeb.Router do
       pipe_through :browser
 
       live_dashboard "/dashboard", metrics: SkullKingWeb.Telemetry
+
+      get "/login-as/:id", SkullKingWeb.AuthController, :login_as
     end
   end
 end

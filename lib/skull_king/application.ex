@@ -10,6 +10,7 @@ defmodule SkullKing.Application do
     children = [
       SkullKing.Repo,
       {Phoenix.PubSub, name: SkullKing.PubSub},
+      SkullKing.Games.State,
       # Start a worker by calling: SkullKing.Worker.start_link(arg)
       # {SkullKing.Worker, arg},
       # Start to serve requests, typically the last entry

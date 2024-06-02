@@ -1,4 +1,4 @@
-defmodule SkullKing.Users.Repo do
+defmodule SkullKing.Users.Storage do
   alias SkullKing.Repo
   alias SkullKing.Users.User
 

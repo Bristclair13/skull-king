@@ -4,8 +4,8 @@ defmodule SkullKing.Games.Storage do
   alias SkullKing.Games.Round
   alias SkullKing.Games.RoundUser
   alias SkullKing.Games.Trick
-  alias SkullKing.Users.User
   alias SkullKing.Repo
+  alias SkullKing.Users.User
 
   @callback get(String.t()) :: Game.t() | nil
   def get(id) do

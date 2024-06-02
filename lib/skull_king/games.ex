@@ -1,8 +1,8 @@
 defmodule SkullKing.Games do
   use Injexor, otp_app: :skull_king, inject: [SkullKing.Games.Storage]
 
-  alias SkullKing.Games.Storage
   alias SkullKing.Games.State
+  alias SkullKing.Games.Storage
   alias SkullKing.Users.User
 
   @callback get(String.t()) :: Game.t() | nil

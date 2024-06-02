@@ -167,7 +167,8 @@ defmodule SkullKing.Games.Deck do
 
   # all special cards have been matched by this point
   # we know it is a color card
-  defp card_wins?(_card, %Card{special: special}) when not is_nil(special) do
+  @specials [:mermaid, :pirate, :skull_king, :surrender]
+  defp card_wins?(_card, %Card{special: special}) when special in @specials do
     false
   end
 

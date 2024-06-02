@@ -1,11 +1,11 @@
 defmodule SkullKing.Games.StorageTest do
   use SkullKing.DataCase, async: true
 
-  alias SkullKing.Games.Storage
   alias SkullKing.Games.Game
   alias SkullKing.Games.GameUser
   alias SkullKing.Games.Round
   alias SkullKing.Games.RoundUser
+  alias SkullKing.Games.Storage
   alias SkullKing.Games.Trick
 
   test "get/1" do
@@ -68,7 +68,7 @@ defmodule SkullKing.Games.StorageTest do
   end
 
   test "create_trick/1" do
-    %{id: game_id} = game = insert(:game)
+    %{id: game_id} = insert(:game)
     %{id: round_id} = insert(:round, game_id: game_id)
     %{id: user_id} = insert(:user)
 

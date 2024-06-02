@@ -2,9 +2,9 @@ defmodule SkullKingWeb.Live.Game do
   use SkullKingWeb, :live_view
 
   alias SkullKing.Games
-  alias SkullKing.Games.State
   alias SkullKing.Games.Deck
   alias SkullKing.Games.RoundUser
+  alias SkullKing.Games.State
 
   def mount(%{"id" => game_id}, session, socket) do
     user = session["current_user"]

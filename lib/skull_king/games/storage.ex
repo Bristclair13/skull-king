@@ -16,8 +16,11 @@ defmodule SkullKing.Games.Storage do
   @callback get_by(Keyword.t()) :: {:ok, Game.t()} | {:error, :game_not_found}
   def get_by(by) do
     case Repo.get_by(Game, by) do
-      game when is_struct(game) -> {:ok, game}
-      _error -> {:error, :game_not_found}
+      game when is_struct(game) ->
+        {:ok, game}
+
+      _error ->
+        {:error, :game_not_found}
     end
   end
 
@@ -28,6 +31,10 @@ defmodule SkullKing.Games.Storage do
     %Game{}
     |> Game.changeset(%{join_code: join_code})
     |> Repo.insert()
+  end
+
+  def force_load_round_users(round) do
+    Repo.preload(round, :users, force: true)
   end
 
   @callback add_user_to_game(User.t(), Game.t()) ::
@@ -42,7 +49,7 @@ defmodule SkullKing.Games.Storage do
   end
 
   @callback create_round(Game.t()) :: {:ok, Round.t()} | {:error, Ecto.Changeset.t()}
-  def(create_round(game)) do
+  def create_round(game) do
     game = Repo.preload(game, :rounds, force: true)
     round_number = length(game.rounds) + 1
 

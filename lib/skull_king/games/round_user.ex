@@ -6,9 +6,9 @@ defmodule SkullKing.Games.RoundUser do
 
   @type t :: %__MODULE__{
           tricks_bid: integer(),
-          tricks_won: integer(),
-          bid_points_won: integer(),
-          bonus_points_won: integer()
+          tricks_won: integer() | nil,
+          bid_points_won: integer() | nil,
+          bonus_points_won: integer() | nil
         }
   schema "rounds_users" do
     field :tricks_bid, :integer

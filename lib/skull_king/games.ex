@@ -10,11 +10,6 @@ defmodule SkullKing.Games do
     Storage.get(id)
   end
 
-  @callback get_by(Keyword.t()) :: {:ok, Game.t()} | {:error, :game_not_found}
-  def get_by(by) do
-    Storage.get_by(by)
-  end
-
   @callback create(User.t()) :: {:ok, Game.t()} | {:error, Ecto.Changeset.t()}
   def create(user) do
     with {:ok, game} <- Storage.create(),
@@ -26,7 +21,7 @@ defmodule SkullKing.Games do
   @callback join_game(User.t(), String.t()) ::
               {:ok, Game.t()} | {:error, :game_not_found} | {:error, :unexpected_error}
   def join_game(user, join_code) do
-    with {:ok, game} <- get_by(join_code: join_code),
+    with {:ok, game} <- Storage.get_by(join_code: join_code),
          {:ok, _game_user} <- Storage.add_user_to_game(user, game) do
       {:ok, game}
     else
@@ -111,7 +106,7 @@ defmodule SkullKing.Games do
           round: round
         })
 
-      round = SkullKing.Storage.preload(round, :round_users, force: true)
+      round = SkullKing.Games.Storage.force_load_round_users(round)
       bidding_complete = length(game.game_users) == length(round.round_users)
       new_state = %{state | round: round, bidding_complete: bidding_complete}
 

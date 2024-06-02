@@ -18,6 +18,13 @@ defmodule SkullKing.Factory do
     }
   end
 
+  def round_user_factory() do
+    %SkullKing.Games.RoundUser{
+      id: UXID.generate(prefix: "round_user"),
+      tricks_bid: 0
+    }
+  end
+
   def game_factory() do
     join_code = for _n <- 1..10, into: "", do: <<Enum.random(~c"0123456789abcdef")>>
 

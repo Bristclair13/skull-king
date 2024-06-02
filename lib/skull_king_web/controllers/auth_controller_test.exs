@@ -2,9 +2,9 @@ defmodule SkullKingWeb.AuthControllerTest do
   use SkullKingWeb.ConnCase, async: true
 
   describe "GET /auth/:provider/callback" do
-    test "success", %{conn: conn} do
-      nil
-    end
+    # test "success", %{conn: conn} do
+    # nil
+    # end
 
     test "failure", %{conn: conn} do
       assert conn

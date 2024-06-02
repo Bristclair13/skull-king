@@ -2,13 +2,13 @@ defmodule SkullKing.UsersTest do
   use SkullKing.DataCase
 
   alias SkullKing.Users
-  alias SkullKing.Users.Repo
+  alias SkullKing.Users.Storage
 
   test "find_or_create/1" do
     user = build(:user)
 
     # user doesn't exist
-    Repo.Mock
+    Storage.Mock
     |> expect(:get, fn "google_id" ->
       nil
     end)
@@ -19,7 +19,7 @@ defmodule SkullKing.UsersTest do
     assert {:ok, ^user} = Users.find_or_create("google_id")
 
     # user already exist
-    Repo.Mock
+    Storage.Mock
     |> expect(:get, fn "google_id" ->
       user
     end)

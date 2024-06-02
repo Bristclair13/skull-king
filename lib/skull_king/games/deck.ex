@@ -50,34 +50,34 @@ defmodule SkullKing.Games.Deck do
   defp new_deck() do
     basic_cards =
       for value <- 1..14, color <- [:green, :yellow, :purple, :black] do
-        %Card{color: color, value: value, image: "/images/cards/#{color}-#{value}.jpg"}
+        %Card{color: color, value: value, image: "/images/cards/#{color}/#{value}.webp"}
       end
 
     surrender_cards =
       Enum.map(1..5, fn _n ->
-        %Card{value: 0, special: :surrender, image: "/images/cards/surrender.jpg"}
+        %Card{value: 0, special: :surrender, image: "/images/cards/surrender.webp"}
       end)
 
     pirate_cards =
       [
-        %Card{special: :pirate, image: "/images/cards/pirate-1.jpg"},
-        %Card{special: :pirate, image: "/images/cards/pirate-2.jpg"},
-        %Card{special: :pirate, image: "/images/cards/pirate-3.jpg"},
-        %Card{special: :pirate, image: "/images/cards/pirate-4.jpg"},
-        %Card{special: :pirate, image: "/images/cards/pirate-5.jpg"}
+        %Card{special: :pirate, image: "/images/cards/pirate-1.webp"},
+        %Card{special: :pirate, image: "/images/cards/pirate-2.webp"},
+        %Card{special: :pirate, image: "/images/cards/pirate-3.webp"},
+        %Card{special: :pirate, image: "/images/cards/pirate-4.webp"},
+        %Card{special: :pirate, image: "/images/cards/pirate-5.webp"}
       ]
 
     mermaid_cards =
       [
-        %Card{special: :mermaid, image: "/images/cards/mermaid-1.jpg"},
-        %Card{special: :mermaid, image: "/images/cards/mermaid-2.jpg"}
+        %Card{special: :mermaid, image: "/images/cards/mermaid-1.webp"},
+        %Card{special: :mermaid, image: "/images/cards/mermaid-2.webp"}
       ]
 
     tigress_card =
-      %Card{special: :tigress, image: "/images/cards/tigress.jpg"}
+      %Card{special: :tigress, image: "/images/cards/tigress.webp"}
 
     skull_king_card =
-      %Card{special: :skull_king, image: "images/cards/skull-king.jpg"}
+      %Card{special: :skull_king, image: "images/cards/skull-king.webp"}
 
     deck =
       [

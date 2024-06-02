@@ -17,7 +17,7 @@ defmodule SkullKing.MockHelper do
   defmacro mock({:__aliases__, ref, mod_parts}) do
     # inside macro so ok to use Mix.env()
     # credo:disable-for-next-line
-    if Mix.env() == :test do
+    if Mix.env() == :test and System.get_env("DISABLE_MOCKS") != "true" do
       mock_module = {:__aliases__, ref, Enum.concat(mod_parts, [:Mock])}
       # convert atom to module
       alias_as = Module.safe_concat([List.last(mod_parts)])

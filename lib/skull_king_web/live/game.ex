@@ -65,48 +65,23 @@ defmodule SkullKingWeb.Live.Game do
       >
         <.bidding_form game={@game} round={@state.round} user={@user} tricks_bid={@tricks_bid} />
       </div>
-      <div
-        :if={@state.current_user_id != @user.id}
-        class="flex justify-center absolute bottom-0 left-0 right-0"
-      >
-        <div :for={card <- @my_cards}>
-          <img src={card.image} class="h-48 w-40" />
-        </div>
-      </div>
       <div class="text-3xl text-white absolute right-6 top-16">
         <div :if={@state.bidding_complete}>Your tricks bid: <%= @my_bid %></div>
       </div>
+      <div class="flex justify-center absolute bottom-16 left-0 right-0 gap-x-2">
+        <.card
+          :for={card <- Deck.mark_cards_as_playable(@my_cards, @state.cards_played)}
+          card={card}
+          my_turn={@state.bidding_complete and @state.current_user_id == @user.id}
+        />
+      </div>
       <div :if={@state.current_user_id == @user.id}>
-        <div class="flex justify-center bottom-0 left-0 right-0 gap-x-2 mb-2 mt-60">
-          <div :for={card <- Deck.mark_cards_as_playable(@my_cards, @state.cards_played)}>
-            <.button
-              :if={card.playable and card.special != :tigress}
-              phx-click="select_card"
-              phx-value-id={card.id}
-              data-confirm="Select Card"
-            >
-              <img src={card.image} class="h-48 w-40" />
-            </.button>
-            <div :if={card.playable and card.special == :tigress}>
-              <img src={card.image} class="h-48 w-40" />
-              <.button>
-                Play as pirate
-              </.button>
-              <.button>
-                Play as surrender
-              </.button>
+        <div>
+          <footer class="absolute bottom-0 bg-neutral-900 left-0 right-0 h-14 text-white underline">
+            <div class="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 mt-4 ml-2 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10">
+              It's your turn
             </div>
-            <img :if={not card.playable} src={card.image} class="opacity-30 h-48 w-40" />
-          </div>
-          <div :if={@state.current_user_id == @user.id}>
-            <div>
-              <footer class="absolute bottom-0 bg-neutral-900 left-0 right-0 h-14 text-white underline">
-                <div class="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 mt-4 ml-2 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10">
-                  It's your turn
-                </div>
-              </footer>
-            </div>
-          </div>
+          </footer>
         </div>
       </div>
     </div>
@@ -196,6 +171,48 @@ defmodule SkullKingWeb.Live.Game do
     State.update_game(socket.assigns.game.id, state)
 
     {:noreply, socket}
+  end
+
+  defp card(%{card: %{playable: true, special: :tigress}, my_turn: true} = assigns) do
+    ~H"""
+    <div>
+      <.card_img image={@card.image} />
+      <.button>
+        Play as pirate
+      </.button>
+      <.button>
+        Play as surrender
+      </.button>
+    </div>
+    """
+  end
+
+  defp card(%{card: %{playable: true}, my_turn: true} = assigns) do
+    ~H"""
+    <div
+      class="cursor-pointer"
+      phx-click="select_card"
+      phx-value-id={@card.id}
+      data-confirm="Select Card"
+    >
+      <.card_img image={@card.image} />
+    </div>
+    """
+  end
+
+  defp card(assigns) do
+    ~H"""
+    <.card_img image={@card.image} class={@card.playable || "opacity-30"} />
+    """
+  end
+
+  attr :image, :string, required: true
+  attr :class, :string, default: nil
+
+  defp card_img(assigns) do
+    ~H"""
+    <img src={@image} class={["h-56 w-40 rounded-lg shadow-lg", @class]} />
+    """
   end
 
   defp bidding_form(assigns) do

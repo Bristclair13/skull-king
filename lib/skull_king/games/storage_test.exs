@@ -132,27 +132,20 @@ defmodule SkullKing.Games.StorageTest do
     %{id: user_id} = insert(:user)
     %{id: game_id} = insert(:game)
     round = insert(:round, number: 4, game_id: game_id)
-
-    params = %{
-      game_id: game_id,
-      user_id: user_id,
-      tricks_bid: 0,
-      round: round
-    }
-
-    {:ok, round_user} = Storage.create_round_user(params)
+    round_user = insert(:round_user, game_id: game_id, user_id: user_id, round: round)
 
     params = %{
       tricks_won: 2,
       bid_points_won: 40,
-      bonus_points_won: 0,
-      game_id: game_id,
-      user_id: user_id,
-      tricks_bid: 1,
-      round: round
+      bonus_points_won: 10
     }
 
-    assert {:ok, %RoundUser{}} = Storage.update_round_user_score(round_user, params)
+    assert {:ok,
+            %RoundUser{
+              tricks_won: 2,
+              bid_points_won: 40,
+              bonus_points_won: 10
+            }} = Storage.update_round_user_score(round_user, params)
   end
 
   test "get_tricks_for_round/1" do

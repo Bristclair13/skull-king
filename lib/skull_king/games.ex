@@ -106,7 +106,7 @@ defmodule SkullKing.Games do
           round: round
         })
 
-      round = SkullKing.Games.Storage.force_load_round_users(round)
+      round = SkullKing.Games.Storage.load_round_users(round)
       bidding_complete = length(game.game_users) == length(round.round_users)
       new_state = %{state | round: round, bidding_complete: bidding_complete}
 

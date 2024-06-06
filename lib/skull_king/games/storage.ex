@@ -33,7 +33,8 @@ defmodule SkullKing.Games.Storage do
     |> Repo.insert()
   end
 
-  def force_load_round_users(round) do
+  @callback load_round_users(Round.t()) :: Round.t()
+  def load_round_users(round) do
     Repo.preload(round, :round_users, force: true)
   end
 

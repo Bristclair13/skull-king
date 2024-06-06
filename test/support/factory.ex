@@ -20,7 +20,7 @@ defmodule SkullKing.Factory do
 
   def round_user_factory() do
     %SkullKing.Games.RoundUser{
-      id: UXID.generate(prefix: "round_user"),
+      id: UXID.generate!(prefix: "round_user"),
       tricks_bid: 0
     }
   end

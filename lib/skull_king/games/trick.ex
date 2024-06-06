@@ -24,6 +24,6 @@ defmodule SkullKing.Games.Trick do
     trick
     |> cast(params, [:bonus_points, :number, :game_id, :round_id, :winning_user_id])
     |> validate_required([:bonus_points, :number, :game_id, :round_id, :winning_user_id])
-    |> unique_constraint([:game_id, :round_id, :number])
+    |> unique_constraint([:round_id, :game_id, :number])
   end
 end

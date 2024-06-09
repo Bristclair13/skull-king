@@ -122,6 +122,25 @@ defmodule SkullKingWeb.Live.Game do
     {:noreply, assign(socket, tricks_bid: tricks_bid)}
   end
 
+  def handle_event("select_tigress", %{"id" => card_id, "special" => special}, socket) do
+    state = socket.assigns.state
+
+    my_cards =
+      Enum.map(state.cards[socket.assigns.user.id], fn card ->
+        if card.id == card_id do
+          %{card | special: String.to_existing_atom(special)}
+        else
+          card
+        end
+      end)
+
+    cards = Map.put(state.cards, socket.assigns.user.id, my_cards)
+    state = %{state | cards: cards}
+
+    socket = assign(socket, state: state)
+    handle_event("select_card", %{"id" => card_id}, socket)
+  end
+
   def handle_event("select_card", %{"id" => card_id}, socket) do
     state = socket.assigns.state
     my_cards = state.cards[socket.assigns.user.id]
@@ -175,14 +194,16 @@ defmodule SkullKingWeb.Live.Game do
 
   defp card(%{card: %{playable: true, special: :tigress}, my_turn: true} = assigns) do
     ~H"""
-    <div>
+    <div class="relative">
       <.card_img image={@card.image} />
-      <.button>
-        Play as pirate
-      </.button>
-      <.button>
-        Play as surrender
-      </.button>
+      <div class="flex flex-col absolute top-1/2 transform -translate-y-1/2 left-0 right-0 bottom-0 gap-y-2 p-2 opacity-0 hover:opacity-80">
+        <.button phx-click="select_tigress" phx-value-id={@card.id} phx-value-special="pirate">
+          Play as pirate
+        </.button>
+        <.button phx-click="select_tigress" phx-value-id={@card.id} phx-value-special="surrender">
+          Play as surrender
+        </.button>
+      </div>
     </div>
     """
   end

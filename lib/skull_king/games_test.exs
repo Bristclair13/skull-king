@@ -3,6 +3,7 @@ defmodule SkullKing.GamesTest do
 
   alias SkullKing.Games.Storage
   alias SkullKing.Games
+  alias SkullKing.Games.State
 
   describe "score_round/1" do
     test "everyone makes their bid" do
@@ -166,16 +167,26 @@ defmodule SkullKing.GamesTest do
       game = %{game | game_users: [game_user]}
 
       Storage.Mock
-      |> expect(:create_round_user, fn %{
-                                         game_id: ^game_id,
-                                         user_id: ^user_id,
-                                         tricks_bid: ^bid,
-                                         round: ^round
-                                       } ->
+      |> expect(:create_round_user, 2, fn %{
+                                            game_id: ^game_id,
+                                            user_id: ^user_id,
+                                            tricks_bid: ^bid
+                                          } ->
         {:ok, round_user}
       end)
-      |> expect(:load_round_users, fn ^round ->
+      |> expect(:load_round_users, 2, fn round ->
         %{round | round_users: [round_user]}
+      end)
+
+      State.Mock
+      |> expect(:get_game, 2, fn ^game_id ->
+        %State.Game{}
+      end)
+      |> expect(:update_game, fn ^game_id, _state ->
+        {:error, :version_mismatch}
+      end)
+      |> expect(:update_game, fn ^game_id, _state ->
+        :ok
       end)
 
       Games.save_bid(game, round, user, bid)

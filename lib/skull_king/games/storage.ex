@@ -1,4 +1,5 @@
 defmodule SkullKing.Games.Storage do
+  @behaviour __MODULE__
   alias SkullKing.Games.Game
   alias SkullKing.Games.GameUser
   alias SkullKing.Games.Round

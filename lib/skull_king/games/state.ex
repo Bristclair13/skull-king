@@ -1,4 +1,6 @@
 defmodule SkullKing.Games.State do
+  @behaviour __MODULE__
+
   defmodule Game do
     defstruct [
       :bidding_complete,
@@ -56,10 +58,12 @@ defmodule SkullKing.Games.State do
     end
   end
 
+  @callback get_game(String.t()) :: %Game{}
   def get_game(game_id) do
     GenServer.call(__MODULE__, {:get_game, game_id})
   end
 
+  @callback update_game(String.t(), %Game{}) :: :ok | {:error, term()}
   def update_game(game_id, %Game{} = state) do
     case GenServer.call(__MODULE__, {:update_game, game_id, state}) do
       {:ok, new_game_state} ->

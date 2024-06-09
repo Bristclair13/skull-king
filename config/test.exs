@@ -28,3 +28,4 @@ config :phoenix, :plug_init_mode, :runtime
 
 config :skull_king, SkullKing.Games, SkullKing.Games.Mock
 config :skull_king, SkullKing.Games.Storage, SkullKing.Games.Storage.Mock
+config :skull_king, SkullKing.Games.State, SkullKing.Games.State.Mock

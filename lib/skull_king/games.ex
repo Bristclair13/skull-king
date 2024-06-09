@@ -1,5 +1,7 @@
 defmodule SkullKing.Games do
-  use Injexor, otp_app: :skull_king, inject: [SkullKing.Games.Storage]
+  use Injexor,
+    otp_app: :skull_king,
+    inject: [SkullKing.Games.Storage, {SkullKing.Games.State, SkullKing.Games.State}]
 
   alias SkullKing.Games.State
   alias SkullKing.Games.Storage

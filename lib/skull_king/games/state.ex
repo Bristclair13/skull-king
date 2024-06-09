@@ -44,7 +44,7 @@ defmodule SkullKing.Games.State do
     current_version =
       case state[game_id] do
         %Game{version: version} -> version
-        nil -> 0
+        nil -> 1
       end
 
     if update_version == current_version or update_version == :reset do

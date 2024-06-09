@@ -40,4 +40,11 @@ defmodule SkullKing.Factory do
       number: 1
     }
   end
+
+  def game_user_factory() do
+    %SkullKing.Games.GameUser{
+      user_order: 1,
+      id: UXID.generate!(prefix: "game_user")
+    }
+  end
 end

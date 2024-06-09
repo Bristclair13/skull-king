@@ -2,6 +2,7 @@ defmodule SkullKing.GamesTest do
   use SkullKing.DataCase, async: true
 
   alias SkullKing.Games.Storage
+  alias SkullKing.Games
 
   describe "score_round/1" do
     test "everyone makes their bid" do
@@ -73,7 +74,7 @@ defmodule SkullKing.GamesTest do
         {:ok, round_user_3}
       end)
 
-      assert :ok = SkullKing.Games.score_round(round)
+      assert :ok = Games.score_round(round)
     end
 
     test "miss bid when bidding 0 and 3" do
@@ -145,7 +146,39 @@ defmodule SkullKing.GamesTest do
         {:ok, round_user_3}
       end)
 
-      assert :ok = SkullKing.Games.score_round(round)
+      assert :ok = Games.score_round(round)
+    end
+  end
+
+  describe "save_bid/4" do
+    test "enters a valid bid" do
+      %{id: game_id} = game = build(:game)
+      round = build(:round, game_id: game_id)
+      %{id: user_id} = user = build(:user)
+      bid = 2
+
+      round_user =
+        build(:round_user, game_id: game_id, round: round, user_id: user_id, tricks_bid: bid)
+
+      game_user =
+        build(:game_user, game_id: game_id, user_id: user_id)
+
+      game = %{game | game_users: [game_user]}
+
+      Storage.Mock
+      |> expect(:create_round_user, fn %{
+                                         game_id: ^game_id,
+                                         user_id: ^user_id,
+                                         tricks_bid: ^bid,
+                                         round: ^round
+                                       } ->
+        {:ok, round_user}
+      end)
+      |> expect(:load_round_users, fn ^round ->
+        %{round | round_users: [round_user]}
+      end)
+
+      Games.save_bid(game, round, user, bid)
     end
   end
 end
